@@ -1,6 +1,6 @@
 compile with this:
 ```
-gcc c_src/udp.c -o bin/libnative_impl.so -I/usr/lib/jvm/java-8-oracle/include/ -I /usr/lib/jvm/java-8-oracle/include/linux/ -shared -fPIC
+gcc c_src/udp.c -o bin/libudp.so -I/usr/lib/jvm/java-8-oracle/include/ -I /usr/lib/jvm/java-8-oracle/include/linux/ -shared -fPIC
 ```
 
 compile server with this:
