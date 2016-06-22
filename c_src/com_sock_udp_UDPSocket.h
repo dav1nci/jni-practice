@@ -47,6 +47,14 @@ JNIEXPORT void JNICALL Java_com_sock_udp_UDPSocket_closeC
 JNIEXPORT jbyteArray JNICALL Java_com_sock_udp_UDPSocket_receiveC
   (JNIEnv *, jobject, jint, jint);
 
+/*
+ * Class:     com_sock_udp_UDPSocket
+ * Method:    connectC
+ * Signature: (III)V
+ */
+JNIEXPORT void JNICALL Java_com_sock_udp_UDPSocket_connectC
+  (JNIEnv *, jobject, jint, jint, jint);
+
 #ifdef __cplusplus
 }
 #endif

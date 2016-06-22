@@ -23,6 +23,7 @@ public class Application {
         int bufLen = 100;
         UDPPacket responce = new UDPPacket(new byte[bufLen], bufLen);
         s2.bind(new InetSocketAddress(8888));
+        s2.connect(new InetSocketAddress("127.0.0.1", 50403));
         s1.send(packet);
         s2.receive(responce);
         System.out.print("Java: ");

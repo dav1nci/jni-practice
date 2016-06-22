@@ -4,11 +4,14 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 /**
  * Created by stdima on 14.06.16.
  */
 public class UDPSocket {
+
 
     static {
         System.loadLibrary("udp");
@@ -28,6 +31,13 @@ public class UDPSocket {
         bindC(this.socketId, ((InetSocketAddress) addr).getPort());
     }
 
+    public void connect(SocketAddress addr){
+        int host = ByteBuffer.wrap(((InetSocketAddress) addr).getAddress().getAddress())
+                .order(ByteOrder.LITTLE_ENDIAN)
+                .getInt();
+        connectC(this.socketId, host, ((InetSocketAddress) addr).getPort());
+    }
+
     public void close(){
         closeC(this.socketId);
     }
@@ -41,5 +51,6 @@ public class UDPSocket {
     private native void bindC(int sockId, int port);
     private native void closeC(int sockId);
     private native byte[] receiveC(int sockId, int bufLen);
+    private native void connectC(int sockId, int host, int port);
 
 }

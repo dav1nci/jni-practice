@@ -82,3 +82,16 @@ JNIEXPORT jbyteArray JNICALL Java_com_sock_udp_UDPSocket_receiveC(JNIEnv *env, j
     return result;
 }
 
+JNIEXPORT void JNICALL Java_com_sock_udp_UDPSocket_connectC(JNIEnv *env, jobject obj, jint sockId, jint host, jint port){
+    struct sockaddr_in conn_sock;
+    conn_sock.sin_family = AF_INET;
+    conn_sock.sin_addr.s_addr = (int)host;
+    conn_sock.sin_port = htons((int)port);
+
+    if (connect((int)sockId, (struct sockaddr *) &conn_sock, sizeof(conn_sock)) < 0){
+        char *className = "java/lang/Exception";
+        jclass excClass = (*env) -> FindClass(env, className);
+        printf("C: Connection failed\n");
+        (*env) -> ThrowNew(env, excClass, "Connection failed");
+    }
+}
