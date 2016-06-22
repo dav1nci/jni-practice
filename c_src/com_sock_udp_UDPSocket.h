@@ -18,10 +18,10 @@ JNIEXPORT jint JNICALL Java_com_sock_udp_UDPSocket_createSocketC
 /*
  * Class:     com_sock_udp_UDPSocket
  * Method:    sendC
- * Signature: (I[BILjava/lang/String;I)V
+ * Signature: (I[BIII)V
  */
 JNIEXPORT void JNICALL Java_com_sock_udp_UDPSocket_sendC
-  (JNIEnv *, jobject, jint, jbyteArray, jint, jstring, jint);
+  (JNIEnv *, jobject, jint, jbyteArray, jint, jint, jint);
 
 /*
  * Class:     com_sock_udp_UDPSocket

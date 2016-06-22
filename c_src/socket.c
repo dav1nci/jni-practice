@@ -8,11 +8,12 @@
 
 JNIEXPORT jint JNICALL Java_com_sock_udp_UDPSocket_createSocketC(JNIEnv *env, jobject obj){
     int s;
-
     if ((s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)
     {
-        printf("Cannot create socket\n");
-        return -1;
+        char *className = "java/lang/Exception";
+        jclass excClass = (*env) -> FindClass(env, className);
+        printf("C: Cannot create socket\n");
+        (*env) -> ThrowNew(env, excClass, "Creation socket failed");
     }
     return s;
 }
@@ -23,13 +24,12 @@ JNIEXPORT void JNICALL Java_com_sock_udp_UDPSocket_sendC(
         jint sock_id, 
         jbyteArray message, 
         jint mess_len,
-        jstring host, 
+        jint host, 
         jint port){
     struct sockaddr_in receiver;
-    // get host from Java String
-    const char *c_host = (*env)->GetStringUTFChars(env, host, NULL);
-
-    receiver.sin_addr.s_addr = inet_addr(c_host);
+    
+    printf("C: try to send on host %d\n", (int)host);
+    receiver.sin_addr.s_addr = (int)host;//inet_addr(c_host);
     receiver.sin_family = AF_INET;
     receiver.sin_port = htons((int)port);
 
@@ -37,8 +37,13 @@ JNIEXPORT void JNICALL Java_com_sock_udp_UDPSocket_sendC(
     jboolean is_copy;
     jint length = (*env) -> GetArrayLength(env, message);
     char *message_c = (*env) -> GetByteArrayElements(env, message, &is_copy);
-    if (sendto(sock_id, message_c, (int)length, 0, (struct sockaddr *) &receiver, sizeof(receiver)) == -1)
-        printf("Sending failed!\n");
+    if (sendto(sock_id, message_c, (int)length, 0, (struct sockaddr *) &receiver, sizeof(receiver)) == -1){
+        char *className = "java/lang/Exception";
+        jclass excClass = (*env) -> FindClass(env, className);
+        printf("C: Sending failed!\n");
+        (*env) -> ThrowNew(env, excClass, "Sending Faied");
+    }
+    printf("C: Message sended\n");
 }
 
 
@@ -48,8 +53,12 @@ JNIEXPORT void JNICALL Java_com_sock_udp_UDPSocket_bindC(JNIEnv *env, jobject ob
     server.sin_addr.s_addr = htonl(INADDR_ANY);
     server.sin_port = htons((int)port);
 
-    if (bind((int)sockId, (struct sockaddr *) &server, sizeof(server)) < 0)
-        printf("C: bind failed\n");
+    if (bind((int)sockId, (struct sockaddr *) &server, sizeof(server)) < 0){
+        char *className = "java/lang/Exception";
+        jclass excClass = (*env) -> FindClass(env, className);
+        printf("C: Bind failed\n");
+        (*env) -> ThrowNew(env, excClass, "Bind failed");
+    }
 }
 
 JNIEXPORT void JNICALL Java_com_sock_udp_UDPSocket_closeC(JNIEnv *env, jobject obj, jint sockId){
@@ -63,8 +72,10 @@ JNIEXPORT jbyteArray JNICALL Java_com_sock_udp_UDPSocket_receiveC(JNIEnv *env, j
     struct sockaddr_in other;
     int sock_len = sizeof(other);
     if ((recv_len = recvfrom((int)sockId, buf, (int)buflen, 0, (struct sockaddr *) &other, &sock_len)) == -1){
-        printf("Cant receive data from socket!\n");
-        return 0;
+        char *className = "java/lang/Exception";
+        jclass excClass = (*env) -> FindClass(env, className);
+        printf("C: Cannot receive message\n");
+        (*env) -> ThrowNew(env, excClass, "Cannot receive message");
     }
     jbyteArray result = (*env) -> NewByteArray(env, (int)buflen);
     (*env) -> SetByteArrayRegion(env, result, 0, (int)buflen, buf);
