@@ -1,9 +1,6 @@
 package com.sock.udp;
 
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -12,6 +9,13 @@ import java.nio.ByteOrder;
  */
 public class UDPSocket {
 
+    private InetAddress remoteAddress;
+    private int remotePort;
+    private InetAddress address;
+    private int port;
+    private boolean bound = false;
+    private boolean closed = false;
+    private boolean connected = false;
 
     static {
         System.loadLibrary("udp");
@@ -28,6 +32,9 @@ public class UDPSocket {
     }
 
     public void bind(SocketAddress addr){
+        this.port = ((InetSocketAddress)addr).getPort();
+        this.address = ((InetSocketAddress) addr).getAddress();//!!!!!!!! NUllPointer
+        this.bound = true;
         bindC(this.socketId, ((InetSocketAddress) addr).getPort());
     }
 
@@ -35,15 +42,50 @@ public class UDPSocket {
         int host = ByteBuffer.wrap(((InetSocketAddress) addr).getAddress().getAddress())
                 .order(ByteOrder.LITTLE_ENDIAN)
                 .getInt();
+        this.remoteAddress = ((InetSocketAddress) addr).getAddress();
+        this.remotePort = ((InetSocketAddress) addr).getPort();
+        this.connected = true;
         connectC(this.socketId, host, ((InetSocketAddress) addr).getPort());
     }
 
+    public void connect(InetAddress address, int port){
+        this.remoteAddress = address;
+        this.remotePort = port;
+        this.connected = true;
+        connectC(this.socketId, ByteBuffer.wrap(address.getAddress()).order(ByteOrder.LITTLE_ENDIAN).getInt(), port);
+    }
+
     public void close(){
+        this.closed = true;
         closeC(this.socketId);
     }
 
     public void receive(UDPPacket packet){
         packet.setMessage(receiveC(this.socketId, packet.getBufLen()));
+    }
+
+    public InetAddress getInetAddress() {
+        return remoteAddress;
+    }
+
+    public InetAddress getLocalSocketAddress() {
+        return address;
+    }
+
+    public int getLocalPort() {
+        return port;
+    }
+
+    public boolean isBound() {
+        return bound;
+    }
+
+    public boolean isClosed() {
+        return closed;
+    }
+
+    public boolean isConnected() {
+        return connected;
     }
 
     private native int createSocketC();
