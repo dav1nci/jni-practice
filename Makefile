@@ -7,7 +7,7 @@ all: bin/com/app/nativecalls/NativeCallsDemo.class
 bin/com/app/nativecalls/NativeCallsDemo.class:
 	mkdir bin
 	mkdir lib
-	javac -d bin/ $(JSDIR)Application.java $(JSDIR)udp/UDPPacket.java $(JSDIR)udp/UDPSocket.java
+	javac -d bin/ $(JSDIR)Application.java $(JSDIR)udp/UDPPacket.java $(JSDIR)udp/UDPSocket.java $(JSDIR)test/ClientSocket.java $(JSDIR)test/ServerSocket.java
 	javah -d $(CSDIR) -classpath ./bin com.sock.udp.UDPSocket
 
 mj:

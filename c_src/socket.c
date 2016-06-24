@@ -28,12 +28,12 @@ JNIEXPORT void JNICALL Java_com_sock_udp_UDPSocket_sendC(
         jint port){
     struct sockaddr_in receiver;
     
-    printf("C: try to send on host %d\n", (int)host);
+    //printf("C: try to send on host %d\n", (int)host);
     receiver.sin_addr.s_addr = (int)host;//inet_addr(c_host);
     receiver.sin_family = AF_INET;
     receiver.sin_port = htons((int)port);
 
-    printf("C: Sending a message...\n");
+    //printf("C: Sending a message...\n");
     jboolean is_copy;
     jint length = (*env) -> GetArrayLength(env, message);
     char *message_c = (*env) -> GetByteArrayElements(env, message, &is_copy);
@@ -43,7 +43,7 @@ JNIEXPORT void JNICALL Java_com_sock_udp_UDPSocket_sendC(
         printf("C: Sending failed!\n");
         (*env) -> ThrowNew(env, excClass, "Sending Faied");
     }
-    printf("C: Message sended\n");
+    //printf("C: Message sended\n");
 }
 
 

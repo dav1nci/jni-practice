@@ -1,6 +1,5 @@
 package com.sock.udp;
 
-import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
