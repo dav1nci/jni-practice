@@ -1,5 +1,6 @@
 package com.sock.udp;
 
+import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -61,7 +62,7 @@ public class UDPPacket {
         return ByteBuffer.wrap(this.address.getAddress()).order(ByteOrder.LITTLE_ENDIAN).getInt();
     }
 
-    int getPort() {
+    public int getPort() {
         return port;
     }
 

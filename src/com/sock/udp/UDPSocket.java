@@ -27,7 +27,6 @@ public class UDPSocket {
     }
 
     public void send(UDPPacket packet){
-
         sendC(this.socketId, packet.getMessage(), packet.getBufLen(), packet.getHost(), packet.getPort());
     }
 
@@ -61,7 +60,7 @@ public class UDPSocket {
     }
 
     public void receive(UDPPacket packet){
-        packet.setMessage(receiveC(this.socketId, packet.getBufLen()));
+        receiveC(this.socketId, packet, packet.getBufLen());
     }
 
     public InetAddress getInetAddress() {
@@ -92,7 +91,7 @@ public class UDPSocket {
     private native void sendC(int sockId, byte[] buf, int len, int host, int port);
     private native void bindC(int sockId, int port);
     private native void closeC(int sockId);
-    private native byte[] receiveC(int sockId, int bufLen);
+    private native void receiveC(int sockId, UDPPacket packet, int buflen);
     private native void connectC(int sockId, int host, int port);
 
 }

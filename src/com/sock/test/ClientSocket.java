@@ -11,21 +11,25 @@ import java.util.concurrent.Callable;
  */
 public class ClientSocket implements Callable<String> {
 
-    private UDPSocket server;
     private String message;
 
-    public ClientSocket(UDPSocket server, String message) {
-        this.server = server;
+    public ClientSocket(String message) {
         this.message = message;
     }
 
     @Override
     public String call() throws Exception {
+        UDPSocket client = new UDPSocket();
+        UDPPacket response = new UDPPacket(new byte[512], 512);
         for (int i = 0; i < 5; ++i){
-            //System.out.println("sending message");
-            server.send(new UDPPacket(this.message.getBytes(), message.length(), new InetSocketAddress("127.0.0.1", 8888)));
-            //Thread.sleep(1000);
+            client.send(new UDPPacket(this.message.getBytes(), message.length(), new InetSocketAddress("127.0.0.1", 8888)));
+            client.receive(response);
+            System.out.println("In client socket responce is");
+            for (byte j : response.getMessage())
+                System.out.print((char)j);
+            System.out.println();
         }
+        client.close();
         return "Client ended";
     }
 }

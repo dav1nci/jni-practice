@@ -42,10 +42,10 @@ JNIEXPORT void JNICALL Java_com_sock_udp_UDPSocket_closeC
 /*
  * Class:     com_sock_udp_UDPSocket
  * Method:    receiveC
- * Signature: (II)[B
+ * Signature: (ILcom/sock/udp/UDPPacket;I)V
  */
-JNIEXPORT jbyteArray JNICALL Java_com_sock_udp_UDPSocket_receiveC
-  (JNIEnv *, jobject, jint, jint);
+JNIEXPORT void JNICALL Java_com_sock_udp_UDPSocket_receiveC
+  (JNIEnv *, jobject, jint, jobject, jint);
 
 /*
  * Class:     com_sock_udp_UDPSocket

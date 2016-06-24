@@ -5,6 +5,8 @@ import com.sock.test.ServerSocket;
 import com.sock.udp.UDPPacket;
 import com.sock.udp.UDPSocket;
 
+import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.*;
@@ -12,6 +14,7 @@ import java.util.concurrent.*;
 public class Application {
 
     public static void main(String[] args) throws UnknownHostException {
+        //testSocket();
         try {
             concurrentTest();
         } catch (InterruptedException e) {
@@ -24,8 +27,8 @@ public class Application {
         UDPSocket server = new UDPSocket();
         server.bind(new InetSocketAddress(8888));
         Callable<String> serverTask = new ServerSocket(server);
-        Callable<String> clientTask1 = new ClientSocket(server, "Hello from client1");
-        Callable<String> clientTask2 = new ClientSocket(server, "Hello from client2");
+        Callable<String> clientTask1 = new ClientSocket("Hello from client1");
+        Callable<String> clientTask2 = new ClientSocket("Hello from client2");
         Future<String> serverResponse = pool.submit(serverTask);
         Future<String> clientResponse1 = pool.submit(clientTask1);
         //Thread.sleep(200);
@@ -50,13 +53,13 @@ public class Application {
         UDPPacket packet = new UDPPacket(message.getBytes(), message.length(), new InetSocketAddress("127.0.0.1", 8888));
 
         int bufLen = 100;
-        UDPPacket responce = new UDPPacket(new byte[bufLen], bufLen);
-        s2.bind(new InetSocketAddress(8888));
-        s2.connect(new InetSocketAddress("127.0.0.1", 50403));
+        UDPPacket response = new UDPPacket(new byte[bufLen], bufLen);
+        s2.bind(new InetSocketAddress(8889));
+        //s2.connect(new InetSocketAddress("127.0.0.1", 50403));
         s1.send(packet);
-        s2.receive(responce);
+        s2.receive(response);
         System.out.print("Java: ");
-        for (byte i : responce.getMessage())
+        for (byte i : response.getMessage())
             System.out.print((char)i);
         System.out.println();
     }

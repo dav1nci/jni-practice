@@ -65,7 +65,8 @@ JNIEXPORT void JNICALL Java_com_sock_udp_UDPSocket_closeC(JNIEnv *env, jobject o
     close((int)sockId);
 }
 
-JNIEXPORT jbyteArray JNICALL Java_com_sock_udp_UDPSocket_receiveC(JNIEnv *env, jobject obj, jint sockId, jint buflen){
+JNIEXPORT void JNICALL Java_com_sock_udp_UDPSocket_receiveC(JNIEnv *env, jobject obj, jint sockId, jobject packet, jint buflen){
+
     int recv_len;
     char buf[(int)buflen];
     memset(buf, '\0', (int)buflen);
@@ -77,9 +78,28 @@ JNIEXPORT jbyteArray JNICALL Java_com_sock_udp_UDPSocket_receiveC(JNIEnv *env, j
         printf("C: Cannot receive message\n");
         (*env) -> ThrowNew(env, excClass, "Cannot receive message");
     }
-    jbyteArray result = (*env) -> NewByteArray(env, (int)buflen);
-    (*env) -> SetByteArrayRegion(env, result, 0, (int)buflen, buf);
-    return result;
+
+    jclass udp_packet_class = (*env) -> GetObjectClass(env, packet);
+
+    jfieldID fidAddress = (*env) -> GetFieldID(env, udp_packet_class, "address", "Ljava/net/InetAddress;");
+    jfieldID fidBuf =     (*env) -> GetFieldID(env, udp_packet_class, "buf", "[B");
+    jfieldID fidPort =    (*env) -> GetFieldID(env, udp_packet_class, "port", "I");
+
+    ////Getting InetAddress object
+
+    jclass inet_address_class = (*env) -> FindClass(env, "java/net/InetAddress");
+
+    jmethodID inet_addr_getByName = (*env) -> GetStaticMethodID(env, inet_address_class, "getByName", "(Ljava/lang/String;)Ljava/net/InetAddress;");
+    jstring host = (*env) -> NewStringUTF(env, inet_ntoa(other.sin_addr));
+    jobject inet_address = (*env) -> CallStaticObjectMethod(env, inet_address_class, inet_addr_getByName, host);
+
+    jbyteArray message = (*env) -> NewByteArray(env, (int)buflen);
+    (*env) -> SetByteArrayRegion(env, message, 0, (int)buflen, buf);
+    (*env) -> SetObjectField(    env, packet,  fidAddress,     inet_address);
+    (*env) -> SetObjectField(    env, packet,  fidBuf,         message);
+    (*env) -> SetIntField(       env, packet,  fidPort,        ntohs(other.sin_port));
+    
+    //printf("Received packet from %s:%d\n", inet_ntoa(other.sin_addr), ntohs(other.sin_port));
 }
 
 JNIEXPORT void JNICALL Java_com_sock_udp_UDPSocket_connectC(JNIEnv *env, jobject obj, jint sockId, jint host, jint port){
