@@ -10,7 +10,11 @@ bin/com/app/nativecalls/NativeCallsDemo.class:
 	javac -d bin/ $(JSDIR)Application.java $(JSDIR)udp/UDPPacket.java $(JSDIR)udp/UDPSocket.java $(JSDIR)test/ClientSocket.java $(JSDIR)test/ServerSocket.java
 	javah -d $(CSDIR) -classpath ./bin com.sock.udp.UDPSocket
 
-mj:
+win:
+	gcc c_src/socket.c -o lib/udp.dll -I"C:\Program Files\Java\jdk1.8.0_91\include" -I"C:\Program Files\Java\jdk1.8.0_91\include\win32"	-shared -l"ws2_32"
+	java -Djava.library.path=lib/ -classpath bin/ com.sock.Application
+
+linux:
 	gcc c_src/socket.c -o lib/libudp.so -I/usr/lib/jvm/java-8-oracle/include/ -I/usr/lib/jvm/java-8-oracle/include/linux/ -shared -fPIC
 	java -Djava.library.path=lib/ -classpath bin/ com.sock.Application
 
@@ -19,3 +23,7 @@ clean:
 	rm c_src/com_sock_udp_UDPSocket.h
 	rm -r lib/
 
+clean-win:
+	rmdir bin /s /q
+	del c_src\com_sock_udp_UDPSocket.h
+	rmdir lib /s /q
