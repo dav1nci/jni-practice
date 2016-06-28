@@ -16,7 +16,7 @@ bin/com/app/nativecalls/NativeCallsDemo.class:
 	echo Main-Class: com.sock.Application > bin/MANIFEST.MF
 
 win:
-	gcc c_src/socket.c -o lib/udp.dll -I"C:\Program Files\Java\jdk1.8.0_91\include" -I"C:\Program Files\Java\jdk1.8.0_91\include\win32"	-shared -l"ws2_32"
+	gcc c_src/socket_win.c -o lib/udp.dll -I"C:\Program Files\Java\jdk1.8.0_91\include" -I"C:\Program Files\Java\jdk1.8.0_91\include\win32"	-shared -l"ws2_32"
 	java -Djava.library.path=lib/ -classpath bin/ com.sock.Application
 
 lin:
