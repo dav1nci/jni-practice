@@ -9,7 +9,7 @@ bin/com/app/nativecalls/NativeCallsDemo.class:
 	mkdir bin
 	echo Main-Class: com.sock.Application > bin/MANIFEST.MF
 	javac -d bin/ $(JSDIR)Application.java $(JSDIR)udp/UDPPacket.java $(JSDIR)udp/UDPSocket.java $(JSDIR)test/ClientSocket.java $(JSDIR)test/ServerSocket.java
-	javah -d $(CSDIR) -classpath ./bin com.sock.udp.UDPSocket
+	javah -d $(CSDIR) -classpath ./bin com.sock.udp.KernelUDPSocket
 
 win:
 	gcc c_src/socket.c -o lib/udp.dll -I"C:\Program Files\Java\jdk1.8.0_91\include" -I"C:\Program Files\Java\jdk1.8.0_91\include\win32"	-shared -l"ws2_32"

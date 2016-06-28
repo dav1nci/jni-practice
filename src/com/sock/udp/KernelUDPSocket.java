@@ -7,22 +7,14 @@ import java.nio.ByteOrder;
 /**
  * Created by stdima on 14.06.16.
  */
-public class UDPSocket {
-
-    private InetAddress remoteAddress;
-    private int remotePort;
-    private InetAddress address;
-    private int port;
-    private boolean bound = false;
-    private boolean closed = false;
-    private boolean connected = false;
+public class KernelUDPSocket extends AbstractUDPSocket{
 
     static {
         System.loadLibrary("udp");
     }
     private int socketId;
 
-    public UDPSocket() {
+    public KernelUDPSocket() {
         this.socketId = createSocketC();
     }
 
@@ -61,30 +53,6 @@ public class UDPSocket {
 
     public void receive(UDPPacket packet){
         receiveC(this.socketId, packet, packet.getBufLen());
-    }
-
-    public InetAddress getInetAddress() {
-        return remoteAddress;
-    }
-
-    public InetAddress getLocalSocketAddress() {
-        return address;
-    }
-
-    public int getLocalPort() {
-        return port;
-    }
-
-    public boolean isBound() {
-        return bound;
-    }
-
-    public boolean isClosed() {
-        return closed;
-    }
-
-    public boolean isConnected() {
-        return connected;
     }
 
     private native int createSocketC();
