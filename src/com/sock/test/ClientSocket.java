@@ -21,7 +21,7 @@ public class ClientSocket implements Callable<String> {
     public String call() throws Exception {
         UDPSocket client = new UDPSocket();
         UDPPacket response = new UDPPacket(new byte[512], 512);
-        for (int i = 0; i < 5; i+=0){
+        for (int i = 0; i < 5; i+=1){
             client.send(new UDPPacket(this.message.getBytes(), message.length(), new InetSocketAddress("127.0.0.1", 8888)));
             client.receive(response);
             System.out.println("In client socket responce is");
