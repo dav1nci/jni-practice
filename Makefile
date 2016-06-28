@@ -8,7 +8,6 @@ all: bin/com/app/nativecalls/NativeCallsDemo.class
 bin/com/app/nativecalls/NativeCallsDemo.class:
 	mkdir bin
 	echo Main-Class: com.sock.Application > bin/MANIFEST.MF
-	mkdir lib
 	javac -d bin/ $(JSDIR)Application.java $(JSDIR)udp/UDPPacket.java $(JSDIR)udp/UDPSocket.java $(JSDIR)test/ClientSocket.java $(JSDIR)test/ServerSocket.java
 	javah -d $(CSDIR) -classpath ./bin com.sock.udp.UDPSocket
 
@@ -23,7 +22,7 @@ lin:
 clean:
 	rm -r bin/
 	rm c_src/com_sock_udp_UDPSocket.h
-	rm -r lib/
+	rm lib/libudp.so
 	rm UDP.jar
 
 clean-win:
@@ -32,7 +31,7 @@ clean-win:
 	rmdir lib /s /q
 
 jar:
-	jar cvfm UDP.jar bin/MANIFEST.MF -C bin/ bin/* lib/
+	jar cvfm UDP.jar bin/MANIFEST.MF -C bin/ . lib/
 
 run:
 	java -Djava.library.path=lib/ -jar UDP.jar
