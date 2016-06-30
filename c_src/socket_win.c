@@ -8,8 +8,8 @@
 
 JNIEXPORT jint JNICALL Java_com_sock_udp_UDPSocket_createSocketC(JNIEnv *env, jobject obj){
     int s;
-	WSADATA wsa;
-	//Initialise winsock
+    WSADATA wsa;
+    //Initialise winsock
     printf("\nInitialising Winsock...");
     if (WSAStartup(MAKEWORD(2,2),&wsa) != 0)
     {
@@ -36,7 +36,7 @@ JNIEXPORT void JNICALL Java_com_sock_udp_UDPSocket_sendC(
         jint host, 
         jint port){
     struct sockaddr_in receiver;
-	memset((char *) &receiver, 0, sizeof(receiver));
+    memset((char *) &receiver, 0, sizeof(receiver));
     
     //printf("C: try to send on host %d\n", (int)host);
     receiver.sin_addr.S_un.S_addr = (int)host;//inet_addr(c_host);

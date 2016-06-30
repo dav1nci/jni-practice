@@ -1,13 +1,26 @@
-#include <stdio.h>
+#ifdef _WIN32
+#include <winsock2.h>
+#else
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <unistd.h> // for close()
+#endif
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "com_sock_udp_UDPSocket.h"
-#include <unistd.h> // for close()
+#include "com_sock_udp_KernelUDPSocket.h"
 
-JNIEXPORT jint JNICALL Java_com_sock_udp_UDPSocket_createSocketC(JNIEnv *env, jobject obj){
+JNIEXPORT jint JNICALL Java_com_sock_udp_KernelUDPSocket_createSocketC(JNIEnv *env, jobject obj){
     int s;
+#ifdef _WIN32
+    WSDATA wsa;
+    printf("\nInitialising Winsock...");
+    if (WSAStartup(MAKEWORD(2,2),&wsa) != 0)
+    {
+        printf("Failed. Error Code : %d",WSAGetLastError());
+        exit(EXIT_FAILURE);
+    }
+#endif
     if ((s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)
     {
         char *className = "java/lang/Exception";
@@ -18,7 +31,7 @@ JNIEXPORT jint JNICALL Java_com_sock_udp_UDPSocket_createSocketC(JNIEnv *env, jo
     return s;
 }
 
-JNIEXPORT void JNICALL Java_com_sock_udp_UDPSocket_sendC(
+JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_sendC(
         JNIEnv *env, 
         jobject obj, 
         jint sock_id, 
@@ -27,9 +40,14 @@ JNIEXPORT void JNICALL Java_com_sock_udp_UDPSocket_sendC(
         jint host, 
         jint port){
     struct sockaddr_in receiver;
-    
+    memset((char *) &receiver, 0, sizeof(receiver));
+
     //printf("C: try to send on host %d\n", (int)host);
+#ifdef _WIN32
+    receiver.sin_addr.S_un.S_addr = (int)host;//inet_addr(c_host);
+#else
     receiver.sin_addr.s_addr = (int)host;//inet_addr(c_host);
+#endif
     receiver.sin_family = AF_INET;
     receiver.sin_port = htons((int)port);
 
@@ -47,7 +65,7 @@ JNIEXPORT void JNICALL Java_com_sock_udp_UDPSocket_sendC(
 }
 
 
-JNIEXPORT void JNICALL Java_com_sock_udp_UDPSocket_bindC(JNIEnv *env, jobject obj, jint sockId, jint port){
+JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_bindC(JNIEnv *env, jobject obj, jint sockId, jint port){
     struct sockaddr_in server;
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -61,11 +79,16 @@ JNIEXPORT void JNICALL Java_com_sock_udp_UDPSocket_bindC(JNIEnv *env, jobject ob
     }
 }
 
-JNIEXPORT void JNICALL Java_com_sock_udp_UDPSocket_closeC(JNIEnv *env, jobject obj, jint sockId){
+JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_closeC(JNIEnv *env, jobject obj, jint sockId){
+#ifdef _WIN32
+    closesocket((int)sockId);
+    WSACleanup();
+#else
     close((int)sockId);
+#endif
 }
 
-JNIEXPORT void JNICALL Java_com_sock_udp_UDPSocket_receiveC(JNIEnv *env, jobject obj, jint sockId, jobject packet, jint buflen){
+JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_receiveC(JNIEnv *env, jobject obj, jint sockId, jobject packet, jint buflen){
 
     int recv_len;
     char buf[(int)buflen];
@@ -98,11 +121,11 @@ JNIEXPORT void JNICALL Java_com_sock_udp_UDPSocket_receiveC(JNIEnv *env, jobject
     (*env) -> SetObjectField(    env, packet,  fidAddress,     inet_address);
     (*env) -> SetObjectField(    env, packet,  fidBuf,         message);
     (*env) -> SetIntField(       env, packet,  fidPort,        ntohs(other.sin_port));
-    
+
     //printf("Received packet from %s:%d\n", inet_ntoa(other.sin_addr), ntohs(other.sin_port));
 }
 
-JNIEXPORT void JNICALL Java_com_sock_udp_UDPSocket_connectC(JNIEnv *env, jobject obj, jint sockId, jint host, jint port){
+JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_connectC(JNIEnv *env, jobject obj, jint sockId, jint host, jint port){
     struct sockaddr_in conn_sock;
     conn_sock.sin_family = AF_INET;
     conn_sock.sin_addr.s_addr = (int)host;

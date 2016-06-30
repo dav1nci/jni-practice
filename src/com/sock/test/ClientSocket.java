@@ -1,7 +1,7 @@
 package com.sock.test;
 
+import com.sock.udp.KernelUDPSocket;
 import com.sock.udp.UDPPacket;
-import com.sock.udp.UDPSocket;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.Callable;
@@ -19,9 +19,9 @@ public class ClientSocket implements Callable<String> {
 
     @Override
     public String call() throws Exception {
-        UDPSocket client = new UDPSocket();
+        KernelUDPSocket client = new KernelUDPSocket();
         UDPPacket response = new UDPPacket(new byte[512], 512);
-        for (int i = 0; i < 5; i+=1){
+        for (int i = 0; i < 5; ++i){
             client.send(new UDPPacket(this.message.getBytes(), message.length(), new InetSocketAddress("127.0.0.1", 8888)));
             client.receive(response);
             System.out.println("In client socket responce is");

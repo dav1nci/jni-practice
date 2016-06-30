@@ -1,9 +1,8 @@
 package com.sock.test;
 
+import com.sock.udp.KernelUDPSocket;
 import com.sock.udp.UDPPacket;
-import com.sock.udp.UDPSocket;
 
-import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Callable;
@@ -13,9 +12,9 @@ import java.util.concurrent.Callable;
  */
 public class ServerSocket implements Callable<String> {
 
-    private UDPSocket server;
+    private KernelUDPSocket server;
 
-    public ServerSocket(UDPSocket server) {
+    public ServerSocket(KernelUDPSocket server) {
         this.server = server;
     }
 

@@ -10,7 +10,7 @@ import java.nio.ByteOrder;
 public class KernelUDPSocket extends AbstractUDPSocket{
 
     static {
-        System.loadLibrary("udp");
+        System.loadLibrary("kernel_udp");
     }
     private int socketId;
 
@@ -18,10 +18,12 @@ public class KernelUDPSocket extends AbstractUDPSocket{
         this.socketId = createSocketC();
     }
 
+    @Override
     public void send(UDPPacket packet){
         sendC(this.socketId, packet.getMessage(), packet.getBufLen(), packet.getHost(), packet.getPort());
     }
 
+    @Override
     public void bind(SocketAddress addr){
         this.port = ((InetSocketAddress)addr).getPort();
         this.address = ((InetSocketAddress) addr).getAddress();//!!!!!!!! NUllPointer
@@ -29,6 +31,7 @@ public class KernelUDPSocket extends AbstractUDPSocket{
         bindC(this.socketId, ((InetSocketAddress) addr).getPort());
     }
 
+    @Override
     public void connect(SocketAddress addr){
         int host = ByteBuffer.wrap(((InetSocketAddress) addr).getAddress().getAddress())
                 .order(ByteOrder.LITTLE_ENDIAN)
@@ -39,6 +42,7 @@ public class KernelUDPSocket extends AbstractUDPSocket{
         connectC(this.socketId, host, ((InetSocketAddress) addr).getPort());
     }
 
+    @Override
     public void connect(InetAddress address, int port){
         this.remoteAddress = address;
         this.remotePort = port;
@@ -46,11 +50,13 @@ public class KernelUDPSocket extends AbstractUDPSocket{
         connectC(this.socketId, ByteBuffer.wrap(address.getAddress()).order(ByteOrder.LITTLE_ENDIAN).getInt(), port);
     }
 
+    @Override
     public void close(){
         this.closed = true;
         closeC(this.socketId);
     }
 
+    @Override
     public void receive(UDPPacket packet){
         receiveC(this.socketId, packet, packet.getBufLen());
     }

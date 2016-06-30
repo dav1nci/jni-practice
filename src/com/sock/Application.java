@@ -2,11 +2,10 @@ package com.sock;
 
 import com.sock.test.ClientSocket;
 import com.sock.test.ServerSocket;
+import com.sock.udp.DBLUDPSocket;
 import com.sock.udp.UDPPacket;
-import com.sock.udp.UDPSocket;
+import com.sock.udp.KernelUDPSocket;
 
-import java.net.Inet4Address;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.*;
@@ -15,17 +14,18 @@ public class Application {
 
     public static void main(String[] args) throws UnknownHostException {
         //testSocket();
-        System.out.println("-D parameter: " + System.getProperty("java.library.path"));
-        try {
-            concurrentTest();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        System.out.println("Java: -D parameter: " + System.getProperty("java.library.path"));
+        testDBLSocket();
+//        try {
+//            concurrentTest();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
     }
 
     public static void concurrentTest() throws InterruptedException {
         ExecutorService pool = Executors.newFixedThreadPool(3);
-        UDPSocket server = new UDPSocket();
+        KernelUDPSocket server = new KernelUDPSocket();
         server.bind(new InetSocketAddress(8888));
         Callable<String> serverTask = new ServerSocket(server);
         Callable<String> clientTask1 = new ClientSocket("Hello from client1");
@@ -47,8 +47,8 @@ public class Application {
     }
 
     public static void testSocket(){
-        UDPSocket s1 = new UDPSocket();
-        UDPSocket s2 = new UDPSocket();
+        KernelUDPSocket s1 = new KernelUDPSocket();
+        KernelUDPSocket s2 = new KernelUDPSocket();
 
         String message = "Hello me name is Dima!";
         UDPPacket packet = new UDPPacket(message.getBytes(), message.length(), new InetSocketAddress("127.0.0.1", 8888));
@@ -63,5 +63,10 @@ public class Application {
         for (byte i : response.getMessage())
             System.out.print((char)i);
         System.out.println();
+    }
+
+    public static void testDBLSocket(){
+        DBLUDPSocket server = new DBLUDPSocket();
+
     }
 }
