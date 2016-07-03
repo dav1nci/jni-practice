@@ -1,9 +1,17 @@
-//#include <dbltest_common.h>
-#include <arpa/inet.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
+#ifdef _WIN32
+#include <winsock2.h>
+#else
+#include <arpa/inet.h>
+#endif
 #include <dbl.h>
 #include "com_sock_udp_DBLUDPSocket.h"
+
+//#ifdef _WIN32
+//#pragma comment(lib, "ws2_32.lib")
+//#endif
 
 #define DBL_Safe(x) do {                              \
     int ret = (x);                                    \

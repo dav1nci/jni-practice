@@ -1,3 +1,7 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "com_sock_udp_KernelUDPSocket.h"
 #ifdef _WIN32
 #include <winsock2.h>
 #else
@@ -5,21 +9,23 @@
 #include <sys/socket.h>
 #include <unistd.h> // for close()
 #endif
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "com_sock_udp_KernelUDPSocket.h"
+
+#ifdef _WIN32
+#pragma comment(lib, "ws2_32.lib")
+#endif
 
 JNIEXPORT jint JNICALL Java_com_sock_udp_KernelUDPSocket_createSocketC(JNIEnv *env, jobject obj){
     int s;
 #ifdef _WIN32
-    WSDATA wsa;
+    WSADATA wsa;
+    //Initialise winsock
     printf("\nInitialising Winsock...");
     if (WSAStartup(MAKEWORD(2,2),&wsa) != 0)
     {
         printf("Failed. Error Code : %d",WSAGetLastError());
         exit(EXIT_FAILURE);
     }
+    printf("Initialised.\n");
 #endif
     if ((s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)
     {
