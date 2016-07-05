@@ -14,15 +14,17 @@ public class Application {
 
     public static void main(String[] args) throws UnknownHostException {
         String local, remote;
-        if (args.length == 2){
+		int port;
+        if (args.length == 3){
             local = args[0];
             remote = args[1];
+			port = Integer.parseInt(args[2]);
         } else {
-            System.out.println("You forgot to enter local and remote ip addresses!");
+            System.out.println("You forgot to enter local and remote ip addresses! and port");
             return;
         }
         //testSocket();
-        testDBLSocket(local, remote);
+        testDBLSocket(local, remote, port);
 //        try {
 //            concurrentTest();
 //        } catch (InterruptedException e) {
@@ -72,11 +74,11 @@ public class Application {
         System.out.println();
     }
 
-    public static void testDBLSocket(String local, String remote){
+    public static void testDBLSocket(String local, String remote, int port){
         DBLUDPSocket server = new DBLUDPSocket(new InetSocketAddress(local, 1)); // i don't use port in this version
         DBLUDPSocket client = new DBLUDPSocket(new InetSocketAddress(remote, 1));
 
-        server.bind(new InetSocketAddress(8888));
+        server.bind(new InetSocketAddress(port));
 
         String message = "Hello me name is Dima!";
         int bufLen = 100;

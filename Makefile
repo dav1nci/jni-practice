@@ -15,7 +15,7 @@ all: bin/com/app/nativecalls/NativeCallsDemo.class
 
 bin/com/app/nativecalls/NativeCallsDemo.class:
 	mkdir bin
-	find -name "*.java" > source.txt
+	dir *.java /b/s > source.txt
 	javac -d bin/ @source.txt
 	
 	javah -d $(CSDIR) -classpath ./bin com.sock.udp.KernelUDPSocket
@@ -24,12 +24,12 @@ bin/com/app/nativecalls/NativeCallsDemo.class:
 win:
 	gcc c_src/kernel_socket.c -o lib/kernel_udp.dll -I"C:\Program Files\Java\jdk1.8.0_91\include" -I"C:\Program Files\Java\jdk1.8.0_91\include\win32" -shared -l"ws2_32"
 	gcc c_src/dbl_socket.c -o lib/dbl_udp.dll -I"C:\Program Files\Java\jdk1.8.0_91\include" -I"C:\Program Files\Java\jdk1.8.0_91\include\win32" -I"C:\DBL_Myri-10G\include" -L"C:\DBL_Myri-10G\lib" -ldbl -Wl,-rpath="C:\DBL_Myri-10G\lib" -shared -l"ws2_32"
-	java -Djava.library.path=lib/ -classpath bin/ com.sock.Application
+	java -Djava.library.path=lib/ -classpath bin/ com.sock.Application 127.0.0.1 127.0.0.5 8888
 
 lin:
 	gcc c_src/kernel_socket.c -o lib/libkernel_udp.so -I/usr/lib/jvm/java-8-oracle/include/ -I/usr/lib/jvm/java-8-oracle/include/linux/ -shared -fPIC
 	gcc c_src/dbl_socket.c -o lib/libdbl_udp.so -I/usr/lib/jvm/java-8-oracle/include/ -I/usr/lib/jvm/java-8-oracle/include/linux/ -I/opt/dbl/include -L/opt/dbl/lib -ldbl -Wl,-rpath=/opt/dbl/lib/ -shared -fPIC
-	java -Djava.library.path=lib/ -classpath bin/ com.sock.Application 127.0.0.1 137.0.0.1
+	java -Djava.library.path=lib/ -classpath bin/ com.sock.Application 127.0.0.1 137.0.0.1 8888
 
 clean:
 	rm -r bin/
@@ -53,4 +53,4 @@ jar:
 	jar cvfm UDP.jar bin/MANIFEST.MF -C bin/ . lib/
 
 run:
-	java -Djava.library.path=lib/ -jar UDP.jar
+	java -Djava.library.path=lib/ -jar UDP.jar 127.0.0.1 127.0.0.5 8888
