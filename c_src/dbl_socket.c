@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <errno.h>
 #ifdef _WIN32
 #include <winsock2.h>
 #else
@@ -9,6 +10,15 @@
 #endif
 #include <dbl.h>
 #include "com_sock_udp_DBLUDPSocket.h"
+
+#define DBL_Safe(x) do {                              \
+    int ret = (x);                                    \
+    if (ret != 0) {                                   \
+      fprintf(stderr, "DBL Failure at line %d: %s (errno=%d)\n", \
+          __LINE__, strerror(ret), ret);                   \
+      exit(-1);                                       \
+    }                                                 \
+} while (0)
 
 //#ifdef _WIN32
 //#pragma comment(lib, "ws2_32.lib")
@@ -22,9 +32,9 @@ int ch_id = 0;
 enum dbl_recvmode recv_mode;
 
 JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_init(JNIEnv *env, jclass class){
-    int result = dbl_init(DBL_VERSION_API);
-    if (result != 0)
-        printf("error in dbl_init()\n");
+    DBL_Safe( dbl_init(DBL_VERSION_API));
+    //if (result != 0)
+    //    printf("error in dbl_init()\n");
     devices = (dbl_device_t **) realloc(devices, sizeof(dbl_device_t *));
     devices[0] = (dbl_device_t *) malloc(sizeof(dbl_device_t));
     struct sockaddr_in sin;
@@ -36,9 +46,9 @@ JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_init(JNIEnv *env, jclass c
 #else
     inet_aton("127.0.0.1", &sin.sin_addr);
 #endif
-    result = dbl_open(&sin.sin_addr, 0, devices[0]);
-    if (result != 0)
-        printf("error in dbl_open()\n");
+    DBL_Safe( dbl_open(&sin.sin_addr, 0, devices[0]));
+    //if (result != 0)
+    //    printf("error in dbl_open()\n");
 }
 
 JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_createSocketC(JNIEnv *env, jobject obj){
@@ -57,24 +67,24 @@ JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_sendC(JNIEnv *env, jobject
     jboolean is_copy;
     char *buf_c = (*env) -> GetByteArrayElements(env, buf, &is_copy);
 
-    dbl_sendto((*channels[(int)sockId]), &remote, buf, (int)bufLen, DBL_NONBLOCK);
+    DBL_Safe( dbl_sendto((*channels[(int)sockId]), &remote, buf, (int)bufLen, DBL_NONBLOCK));
 }
 
 JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_bindC(JNIEnv *env, jobject obj, jint sockId, jint port){
-    int result = dbl_bind((*devices[0]), 0, (int)port, NULL, channels[(int)sockId]);
-    if(result != 0)
-        printf("error in dbl_bind()");
+    DBL_Safe( dbl_bind((*devices[0]), 0, (int)port, NULL, channels[(int)sockId]));
+    //if(result != 0)
+    //    printf("error in dbl_bind()");
 }
 
 JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_closeC(JNIEnv *env, jobject obj, jint sockId){
-    dbl_unbind((*channels[sockId]));
+    DBL_Safe( dbl_unbind((*channels[sockId])));
     //dbl_close(devices[0]);
 }
 
 JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_receiveC(JNIEnv *env, jobject obj, jint sockId, jobject packet, jint bufLen){
     char buf[bufLen];
     struct dbl_recv_info rxinfo;
-    dbl_recvfrom((*devices[0]), DBL_RECV_DEFAULT, buf, bufLen, &rxinfo);
+    DBL_Safe( dbl_recvfrom((*devices[0]), DBL_RECV_DEFAULT, buf, bufLen, &rxinfo));
     jclass udp_packet_class = (*env) -> GetObjectClass(env, packet);
 
     jfieldID fidAddress = (*env) -> GetFieldID(env, udp_packet_class, "address", "Ljava/net/InetAddress;");
