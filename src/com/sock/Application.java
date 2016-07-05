@@ -14,7 +14,6 @@ public class Application {
 
     public static void main(String[] args) throws UnknownHostException {
         //testSocket();
-        System.out.println("Java: -D parameter: " + System.getProperty("java.library.path"));
         testDBLSocket();
 //        try {
 //            concurrentTest();

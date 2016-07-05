@@ -15,10 +15,11 @@ all: bin/com/app/nativecalls/NativeCallsDemo.class
 
 bin/com/app/nativecalls/NativeCallsDemo.class:
 	mkdir bin
+	find -name "*.java" > source.txt
 	javac -d bin/ @source.txt
+	rm source.txt
 	javah -d $(CSDIR) -classpath ./bin com.sock.udp.KernelUDPSocket
 	javah -d $(CSDIR) -classpath ./bin com.sock.udp.DBLUDPSocket
-	echo Main-Class: com.sock.Application > bin/MANIFEST.MF
 
 win:
 	gcc c_src/kernel_socket.c -o lib/kernel_udp.dll -I"C:\Program Files\Java\jdk1.8.0_91\include" -I"C:\Program Files\Java\jdk1.8.0_91\include\win32" -shared -l"ws2_32"
@@ -36,7 +37,7 @@ clean:
 	rm c_src/com_sock_udp_DBLUDPSocket.h
 	rm lib/libdbl_udp.so
 	rm lib/libkernel_udp.so
-	rm lib/libudp.so
+	rm lib/libdbl_udp.so
 	rm UDP.jar
 
 clean-win:
@@ -49,6 +50,7 @@ clean-win:
 	del UDP.jar
 
 jar:
+	echo Main-Class: com.sock.Application > bin/MANIFEST.MF
 	jar cvfm UDP.jar bin/MANIFEST.MF -C bin/ . lib/
 
 run:
