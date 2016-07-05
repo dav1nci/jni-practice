@@ -8,6 +8,7 @@ import java.net.SocketAddress;
  * Created by stdima on 28.06.16.
  */
 public abstract class AbstractUDPSocket {
+	protected int socketId;
     protected InetAddress remoteAddress;
     protected int remotePort;
     protected InetAddress address;
