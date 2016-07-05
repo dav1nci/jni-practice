@@ -15,9 +15,9 @@ all: bin/com/app/nativecalls/NativeCallsDemo.class
 
 bin/com/app/nativecalls/NativeCallsDemo.class:
 	mkdir bin
-	find -name "*.java" > source.txt
+	dir *.java /b/s > source.txt
 	javac -d bin/ @source.txt
-	rm source.txt
+	
 	javah -d $(CSDIR) -classpath ./bin com.sock.udp.KernelUDPSocket
 	javah -d $(CSDIR) -classpath ./bin com.sock.udp.DBLUDPSocket
 
