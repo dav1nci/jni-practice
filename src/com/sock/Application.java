@@ -66,6 +66,19 @@ public class Application {
 
     public static void testDBLSocket(){
         DBLUDPSocket server = new DBLUDPSocket();
+        DBLUDPSocket client = new DBLUDPSocket();
 
+        server.bind(new InetSocketAddress(8889));
+
+        String message = "Hello me name is Dima!";
+        int bufLen = 100;
+        UDPPacket packet = new UDPPacket(message.getBytes(), message.length(), new InetSocketAddress("127.0.0.1", 8888));
+        UDPPacket response = new UDPPacket(new byte[bufLen], bufLen);
+        client.send(packet);
+        server.receive(response);
+        System.out.print("Java: ");
+        for (byte i : response.getMessage())
+            System.out.print((char)i);
+        System.out.println();
     }
 }

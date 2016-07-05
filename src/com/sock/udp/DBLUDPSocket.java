@@ -1,6 +1,7 @@
 package com.sock.udp;
 
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
 /**
@@ -13,14 +14,21 @@ public class DBLUDPSocket extends AbstractUDPSocket {
         init();
     }
 
+    public DBLUDPSocket() {
+        this.socketId = createSocketC();
+    }
+
     @Override
     public void send(UDPPacket packet) {
-
+        sendC(this.socketId, packet.getMessage(), packet.getBufLen(), packet.getHost(), packet.getPort());
     }
 
     @Override
     public void bind(SocketAddress addr) {
-
+        this.port = ((InetSocketAddress)addr).getPort();
+        this.address = ((InetSocketAddress) addr).getAddress();//!!!!!!!! NUllPointer
+        this.bound = true;
+        bindC(this.socketId, ((InetSocketAddress) addr).getPort());
     }
 
     @Override
@@ -35,12 +43,13 @@ public class DBLUDPSocket extends AbstractUDPSocket {
 
     @Override
     public void close() {
-
+        this.closed = true;
+        closeC(this.socketId);
     }
 
     @Override
     public void receive(UDPPacket packet) {
-
+        receiveC(this.socketId, packet, packet.getBufLen());
     }
 
     private static native void init();

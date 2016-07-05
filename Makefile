@@ -37,7 +37,6 @@ clean:
 	rm c_src/com_sock_udp_DBLUDPSocket.h
 	rm lib/libdbl_udp.so
 	rm lib/libkernel_udp.so
-	rm lib/libdbl_udp.so
 	rm UDP.jar
 
 clean-win:

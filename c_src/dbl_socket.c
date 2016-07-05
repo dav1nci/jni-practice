@@ -32,7 +32,7 @@ JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_init(JNIEnv *env, jclass c
     sin.sin_family = AF_INET;
     sin.sin_port = htons(8888);
 #ifdef _WIN32
-	sin.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
+    sin.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
 #else
     inet_aton("127.0.0.1", &sin.sin_addr);
 #endif
@@ -62,6 +62,8 @@ JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_sendC(JNIEnv *env, jobject
 
 JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_bindC(JNIEnv *env, jobject obj, jint sockId, jint port){
     int result = dbl_bind((*devices[0]), 0, (int)port, NULL, channels[(int)sockId]);
+    if(result != 0)
+        printf("error in dbl_bind()");
 }
 
 JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_closeC(JNIEnv *env, jobject obj, jint sockId){

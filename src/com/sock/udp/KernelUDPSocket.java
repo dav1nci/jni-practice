@@ -12,7 +12,7 @@ public class KernelUDPSocket extends AbstractUDPSocket{
     static {
         System.loadLibrary("kernel_udp");
     }
-    private int socketId;
+
 
     public KernelUDPSocket() {
         this.socketId = createSocketC();
