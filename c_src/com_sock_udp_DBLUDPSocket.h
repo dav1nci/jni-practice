@@ -18,10 +18,10 @@ JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_init
 /*
  * Class:     com_sock_udp_DBLUDPSocket
  * Method:    createSocketC
- * Signature: ()I
+ * Signature: (I)I
  */
 JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_createSocketC
-  (JNIEnv *, jobject);
+  (JNIEnv *, jobject, jint);
 
 /*
  * Class:     com_sock_udp_DBLUDPSocket

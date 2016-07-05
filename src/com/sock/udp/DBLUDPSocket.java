@@ -3,6 +3,8 @@ package com.sock.udp;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 /**
  * Created by stdima on 28.06.16.
@@ -14,8 +16,11 @@ public class DBLUDPSocket extends AbstractUDPSocket {
         init();
     }
 
-    public DBLUDPSocket() {
-        this.socketId = createSocketC();
+    public DBLUDPSocket(SocketAddress address) {
+        int host = ByteBuffer.wrap(((InetSocketAddress) address).getAddress().getAddress())
+                .order(ByteOrder.LITTLE_ENDIAN)
+                .getInt();
+        this.socketId = createSocketC(host);
     }
 
     @Override
@@ -53,7 +58,7 @@ public class DBLUDPSocket extends AbstractUDPSocket {
     }
 
     private static native void init();
-    private native int createSocketC();
+    private native int createSocketC(int host);
     private native void sendC(int sockId, byte[] buf, int len, int host, int port);
     private native void bindC(int sockId, int port);
     private native void closeC(int sockId);

@@ -13,8 +13,16 @@ import java.util.concurrent.*;
 public class Application {
 
     public static void main(String[] args) throws UnknownHostException {
+        String local, remote;
+        if (args.length == 2){
+            local = args[0];
+            remote = args[1];
+        } else {
+            System.out.println("You forgot to enter local and remote ip addresses!");
+            return;
+        }
         //testSocket();
-        testDBLSocket();
+        testDBLSocket(local, remote);
 //        try {
 //            concurrentTest();
 //        } catch (InterruptedException e) {
@@ -64,15 +72,15 @@ public class Application {
         System.out.println();
     }
 
-    public static void testDBLSocket(){
-        DBLUDPSocket server = new DBLUDPSocket();
-        DBLUDPSocket client = new DBLUDPSocket();
+    public static void testDBLSocket(String local, String remote){
+        DBLUDPSocket server = new DBLUDPSocket(new InetSocketAddress(local, 1)); // i don't use port in this version
+        DBLUDPSocket client = new DBLUDPSocket(new InetSocketAddress(remote, 1));
 
-        server.bind(new InetSocketAddress(8889));
+        server.bind(new InetSocketAddress(8888));
 
         String message = "Hello me name is Dima!";
         int bufLen = 100;
-        UDPPacket packet = new UDPPacket(message.getBytes(), message.length(), new InetSocketAddress("127.0.0.1", 8888));
+        UDPPacket packet = new UDPPacket(message.getBytes(), message.length(), new InetSocketAddress(local, 8888));
         UDPPacket response = new UDPPacket(new byte[bufLen], bufLen);
         client.send(packet);
         server.receive(response);
