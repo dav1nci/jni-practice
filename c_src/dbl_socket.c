@@ -56,14 +56,20 @@ JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_createSocketC(JNIEnv *env,
 
 JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_sendC(JNIEnv *env, jobject obj, jint sockId, jbyteArray buf, jint bufLen, jint host, jint port){
     struct sockaddr_in remote;
+	memset((char *) &remote, 0, sizeof(remote));
     remote.sin_family = AF_INET;
     remote.sin_port = htons((int)port);
-    remote.sin_addr.s_addr = (int)host;
+#ifdef _WIN32
+    remote.sin_addr.S_un.S_addr = (int)host;//inet_addr(c_host);
+#else
+    remote.sin_addr.s_addr = (int)host;//inet_addr(c_host);
+#endif
 
     jboolean is_copy;
     char *buf_c = (*env) -> GetByteArrayElements(env, buf, &is_copy);
+	printf("Trying to send ");
 
-    DBL_Safe(dbl_sendto((*channels[(int)sockId]), &remote, buf, (int)bufLen, DBL_NONBLOCK));
+    DBL_Safe(dbl_sendto((*channels[0]), &remote, buf_c, (int)bufLen, 0));
 }
 
 JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_bindC(JNIEnv *env, jobject obj, jint sockId, jint port){
