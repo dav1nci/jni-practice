@@ -15,7 +15,7 @@ all: bin/com/app/nativecalls/NativeCallsDemo.class
 
 bin/com/app/nativecalls/NativeCallsDemo.class:
 	mkdir bin
-	dir *.java /b/s > source.txt
+	find -name "*.java" > source.txt
 	javac -d bin/ @source.txt
 	
 	javah -d $(CSDIR) -classpath ./bin com.sock.udp.KernelUDPSocket
@@ -29,7 +29,7 @@ win:
 lin:
 	gcc c_src/kernel_socket.c -o lib/libkernel_udp.so -I/usr/lib/jvm/java-8-oracle/include/ -I/usr/lib/jvm/java-8-oracle/include/linux/ -shared -fPIC
 	gcc c_src/dbl_socket.c -o lib/libdbl_udp.so -I/usr/lib/jvm/java-8-oracle/include/ -I/usr/lib/jvm/java-8-oracle/include/linux/ -I/opt/dbl/include -L/opt/dbl/lib -ldbl -Wl,-rpath=/opt/dbl/lib/ -shared -fPIC
-	java -Djava.library.path=lib/ -classpath bin/ com.sock.Application 127.0.0.1 137.0.0.1 8888
+	java -Djava.library.path=lib/ -classpath bin/ com.sock.Application 10.115.66.139 10.115.55.139 8888
 
 clean:
 	rm -r bin/
@@ -53,4 +53,4 @@ jar:
 	jar cvfm UDP.jar bin/MANIFEST.MF -C bin/ . lib/
 
 run:
-	java -Djava.library.path=lib/ -jar UDP.jar 127.0.0.1 127.0.0.5 8888
+	java -Djava.library.path=lib/ -jar UDP.jar 10.115.66.139 10.115.55.139 8888

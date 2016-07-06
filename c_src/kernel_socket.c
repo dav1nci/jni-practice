@@ -12,22 +12,25 @@
 
 #ifdef _WIN32
 #pragma comment(lib, "ws2_32.lib")
+bool is_init = 0;
 #endif
 
 JNIEXPORT jint JNICALL Java_com_sock_udp_KernelUDPSocket_createSocketC(JNIEnv *env, jobject obj){
     int s;
 #ifdef _WIN32
-    WSADATA wsa;
-    //Initialise winsock
-    printf("\nInitialising Winsock...");
-    if (WSAStartup(MAKEWORD(2,2),&wsa) != 0)
-    {
-        printf("Failed. Error Code : %d",WSAGetLastError());
-        exit(EXIT_FAILURE);
+    if (is_init == 0){
+        WSADATA wsa;
+        //Initialise winsock
+        printf("\nInitialising Winsock...");
+        if (WSAStartup(MAKEWORD(2,2),&wsa) != 0)
+        {
+            printf("Failed. Error Code : %d",WSAGetLastError());
+            exit(EXIT_FAILURE);
+        }
+        is_init = 1;
     }
-    printf("Initialised.\n");
 #endif
-    if ((s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)
+    if ((s = socket(AF_INET, SOCK_DGRAM, 0)) == 0)
     {
         char *className = "java/lang/Exception";
         jclass excClass = (*env) -> FindClass(env, className);
@@ -71,13 +74,14 @@ JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_sendC(
 }
 
 
-JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_bindC(JNIEnv *env, jobject obj, jint sockId, jint port){
-    struct sockaddr_in server;
-    server.sin_family = AF_INET;
-    server.sin_addr.s_addr = htonl(INADDR_ANY);
-    server.sin_port = htons((int)port);
+JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_bindC(JNIEnv *env, jobject obj, jint sockId, jint host, jint port){
+    struct sockaddr_in sin;
+    memset(&sin, 0, sizeof(sin));
+    sin.sin_family = AF_INET;
+    sin.sin_addr.s_addr = (int)host;
+    sin.sin_port = htons((int)port);
 
-    if (bind((int)sockId, (struct sockaddr *) &server, sizeof(server)) < 0){
+    if (bind((int)sockId, (struct sockaddr *) &sin, sizeof(sin)) < 0){
         char *className = "java/lang/Exception";
         jclass excClass = (*env) -> FindClass(env, className);
         printf("C: Bind failed\n");

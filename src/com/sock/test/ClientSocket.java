@@ -12,9 +12,11 @@ import java.util.concurrent.Callable;
 public class ClientSocket implements Callable<String> {
 
     private String message;
+    private String address;
 
-    public ClientSocket(String message) {
+    public ClientSocket(String message, String address) {
         this.message = message;
+        this.address = address;
     }
 
     @Override
@@ -22,7 +24,7 @@ public class ClientSocket implements Callable<String> {
         KernelUDPSocket client = new KernelUDPSocket();
         UDPPacket response = new UDPPacket(new byte[512], 512);
         for (int i = 0; i < 5; ++i){
-            client.send(new UDPPacket(this.message.getBytes(), message.length(), new InetSocketAddress("127.0.0.1", 8888)));
+            client.send(new UDPPacket(this.message.getBytes(), message.length(), new InetSocketAddress(address, 8888)));
             client.receive(response);
             System.out.println("In client socket responce is");
             for (byte j : response.getMessage())

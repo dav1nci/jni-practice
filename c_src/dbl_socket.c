@@ -27,7 +27,7 @@
 dbl_device_t **devices;
 dbl_channel_t **channels;
 dbl_send_t **send_handles;
-dbl_sent_t sendh;
+dbl_send_t sendh;
 
 int ch_id = 0;
 

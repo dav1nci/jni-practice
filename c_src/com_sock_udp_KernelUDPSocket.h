@@ -26,10 +26,10 @@ JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_sendC
 /*
  * Class:     com_sock_udp_KernelUDPSocket
  * Method:    bindC
- * Signature: (II)V
+ * Signature: (III)V
  */
 JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_bindC
-  (JNIEnv *, jobject, jint, jint);
+  (JNIEnv *, jobject, jint, jint, jint);
 
 /*
  * Class:     com_sock_udp_KernelUDPSocket

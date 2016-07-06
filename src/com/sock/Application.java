@@ -13,32 +13,32 @@ import java.util.concurrent.*;
 public class Application {
 
     public static void main(String[] args) throws UnknownHostException {
-        String local, remote;
+        String server, client;
 		int port;
         if (args.length == 3){
-            local = args[0];
-            remote = args[1];
+            server = args[0];
+            client= args[1];
 			port = Integer.parseInt(args[2]);
         } else {
             System.out.println("You forgot to enter local and remote ip addresses! and port");
             return;
         }
-        //testSocket();
-        testDBLSocket(local, remote, port);
-//        try {
-//            concurrentTest();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
+        //testSocket(server, client, port);
+        //testDBLSocket(local, remote, port);
+        try {
+            concurrentTest(server, port);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
-    public static void concurrentTest() throws InterruptedException {
+    public static void concurrentTest(String serverIp, int port) throws InterruptedException {
         ExecutorService pool = Executors.newFixedThreadPool(3);
         KernelUDPSocket server = new KernelUDPSocket();
-        server.bind(new InetSocketAddress(8888));
+        server.bind(new InetSocketAddress(serverIp, port));
         Callable<String> serverTask = new ServerSocket(server);
-        Callable<String> clientTask1 = new ClientSocket("Hello from client1");
-        Callable<String> clientTask2 = new ClientSocket("Hello from client2");
+        Callable<String> clientTask1 = new ClientSocket("Hello from client1", serverIp);
+        Callable<String> clientTask2 = new ClientSocket("Hello from client2", serverIp);
         Future<String> serverResponse = pool.submit(serverTask);
         Future<String> clientResponse1 = pool.submit(clientTask1);
         //Thread.sleep(200);
@@ -55,16 +55,16 @@ public class Application {
         pool.shutdown();
     }
 
-    public static void testSocket(){
+    public static void testSocket(String server, String client, int port){
         KernelUDPSocket s1 = new KernelUDPSocket();
         KernelUDPSocket s2 = new KernelUDPSocket();
 
         String message = "Hello me name is Dima!";
-        UDPPacket packet = new UDPPacket(message.getBytes(), message.length(), new InetSocketAddress("127.0.0.1", 8888));
+        UDPPacket packet = new UDPPacket(message.getBytes(), message.length(), new InetSocketAddress(server, port));
 
         int bufLen = 100;
         UDPPacket response = new UDPPacket(new byte[bufLen], bufLen);
-        s2.bind(new InetSocketAddress(8889));
+        s2.bind(new InetSocketAddress(server, port));
         //s2.connect(new InetSocketAddress("127.0.0.1", 50403));
         s1.send(packet);
         s2.receive(response);

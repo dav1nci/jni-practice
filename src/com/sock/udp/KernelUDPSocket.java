@@ -18,6 +18,7 @@ public class KernelUDPSocket extends AbstractUDPSocket{
         this.socketId = createSocketC();
     }
 
+
     @Override
     public void send(UDPPacket packet){
         sendC(this.socketId, packet.getMessage(), packet.getBufLen(), packet.getHost(), packet.getPort());
@@ -26,9 +27,13 @@ public class KernelUDPSocket extends AbstractUDPSocket{
     @Override
     public void bind(SocketAddress addr){
         this.port = ((InetSocketAddress)addr).getPort();
-        this.address = ((InetSocketAddress) addr).getAddress();//!!!!!!!! NUllPointer
+        this.address = ((InetSocketAddress) addr).getAddress();
         this.bound = true;
-        bindC(this.socketId, ((InetSocketAddress) addr).getPort());
+        bindC(
+                this.socketId,
+                ByteBuffer.wrap(address.getAddress()).order(ByteOrder.LITTLE_ENDIAN).getInt(), //host in int32
+                ((InetSocketAddress) addr).getPort()
+        );
     }
 
     @Override
@@ -63,7 +68,7 @@ public class KernelUDPSocket extends AbstractUDPSocket{
 
     private native int createSocketC();
     private native void sendC(int sockId, byte[] buf, int len, int host, int port);
-    private native void bindC(int sockId, int port);
+    private native void bindC(int sockId, int host, int port);
     private native void closeC(int sockId);
     private native void receiveC(int sockId, UDPPacket packet, int buflen);
     private native void connectC(int sockId, int host, int port);
