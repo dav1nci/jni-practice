@@ -6,6 +6,7 @@ import com.sock.udp.UDPPacket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Callable;
+import java.math.BigInteger;
 
 /**
  * Created by stdima on 23.06.16.
@@ -26,7 +27,7 @@ public class ServerSocket implements Callable<String> {
             server.receive(buf);
             System.out.println("Server: message is \"" + new String(buf.getMessage()) + "\"");
             System.out.println("Message comes from " + buf.getHost() + " port: " + buf.getPort());
-            InetAddress client = InetAddress.getByName("127.0.0.1");
+            InetAddress client = InetAddress.getByAddress(BigInteger.valueOf(buf.getHost()).toByteArray());
             server.send(new UDPPacket(buf.getMessage(),
                     buf.getBufLen(),
                     new InetSocketAddress(client, buf.getPort())));

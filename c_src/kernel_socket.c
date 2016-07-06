@@ -12,13 +12,16 @@
 
 #ifdef _WIN32
 #pragma comment(lib, "ws2_32.lib")
-bool is_init = 0;
+typedef int bool;
+#define true 1
+#define false 0
+bool is_init = false;
 #endif
 
 JNIEXPORT jint JNICALL Java_com_sock_udp_KernelUDPSocket_createSocketC(JNIEnv *env, jobject obj){
     int s;
 #ifdef _WIN32
-    if (is_init == 0){
+    if (is_init == false){
         WSADATA wsa;
         //Initialise winsock
         printf("\nInitialising Winsock...");
@@ -27,7 +30,7 @@ JNIEXPORT jint JNICALL Java_com_sock_udp_KernelUDPSocket_createSocketC(JNIEnv *e
             printf("Failed. Error Code : %d",WSAGetLastError());
             exit(EXIT_FAILURE);
         }
-        is_init = 1;
+        is_init = true;
     }
 #endif
     if ((s = socket(AF_INET, SOCK_DGRAM, 0)) == 0)
