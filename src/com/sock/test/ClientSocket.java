@@ -23,7 +23,7 @@ public class ClientSocket implements Callable<String> {
     public String call() throws Exception {
         KernelUDPSocket client = new KernelUDPSocket();
         UDPPacket response = new UDPPacket(new byte[512], 512);
-        for (int i = 0; i < 5; ++i){
+        for (int i = 0; i < 5; i++){
             client.send(new UDPPacket(this.message.getBytes(), message.length(), new InetSocketAddress(address, 8888)));
             client.receive(response);
             System.out.println("In client socket responce is");

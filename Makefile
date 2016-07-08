@@ -43,9 +43,8 @@ clean-win:
 	rmdir bin /s /q
 	del c_src\com_sock_udp_KernelUDPSocket.h
 	del c_src\com_sock_udp_DBLUDPSocket.h
-	del lib/libdbl_udp.so
-	del lib/libkernel_udp.so
-	del lib/libudp.so
+	del lib\dbl_udp.dll
+	del lib\kernel_udp.dll
 	del UDP.jar
 
 jar:
