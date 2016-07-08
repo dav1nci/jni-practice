@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <errno.h>
+#include <assert.h>
 #ifdef _WIN32
 #include <winsock2.h>
 #else
@@ -71,6 +72,7 @@ JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_sendC(JNIEnv *env, jobject
 }
 
 JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_sendToC(JNIEnv *env, jobject obj, jint channId, jint host, jint port, jbyteArray buf, jint bufLen, jint flag){
+    assert((int) bufLen > 1);
     struct sockaddr_in remote;
     memset(&remote, 0, sizeof(remote));
     remote.sin_family = AF_INET;
@@ -87,6 +89,8 @@ JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_sendToC(JNIEnv *env, jobje
 }
 
 JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_sendConnectC(JNIEnv *env, jobject obj, jint channId, jint host, jint port, jint flag, jint ttl){
+    assert((int)channId >= 0);
+    assert((int)send_handles_num >= 0);
     // Get memory for new connect_handler
     send_handles = (dbl_send_t **) realloc(send_handles, (send_handles_num + 1) * sizeof(dbl_send_t *));
     send_handles[send_handles_num] = (dbl_send_t *) malloc(sizeof(dbl_send_t));
@@ -104,6 +108,8 @@ JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_sendConnectC(JNIEnv *env, 
 }
 
 JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_bindC(JNIEnv *env, jobject obj, jint devId, jint flag, jint port){
+    assert((int)devId >= 0);
+    assert(channels_num >= 0);
     channels = (dbl_channel_t **) realloc(channels, (channels_num + 1) * sizeof(dbl_channel_t *));
     channels[channels_num] = (dbl_channel_t *) malloc(sizeof(dbl_channel_t));
     channels_num++;
@@ -112,6 +118,7 @@ JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_bindC(JNIEnv *env, jobject
 }
 
 JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_receiveFromC(JNIEnv *env, jobject obj, jint devId, jint recvMode, jobject packet, jint bufLen){
+    assert((int)devId >= 0);
     char buf[(int)bufLen];
     struct dbl_recv_info rxinfo;
     enum dbl_recvmode rmode = recvMode;
@@ -137,7 +144,6 @@ JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_receiveFromC(JNIEnv *env, 
 }
 
 JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_shutdownC(JNIEnv *env, jobject obj, jint devId){
-
     DBL_Safe(dbl_shutdown((*devices[devId]), 0));
 }
 
