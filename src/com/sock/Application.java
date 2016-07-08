@@ -23,13 +23,22 @@ public class Application {
             System.out.println("You forgot to enter local and remote ip addresses! and port");
             return;
         }
-        //testSocket(server, client, port);
-        testDBLSocket(server, client, port);
-        //try {
-        //    concurrentTest(server, port);
-        //} catch (InterruptedException e) {
-        //    e.printStackTrace();
-        //}
+
+        switch (args[3]){
+            case "1":
+                testSocket(server, client, port);
+                break;
+            case "2":
+                testDBLSocket(server, client, port);
+                break;
+            case "3":
+                try {
+                        concurrentTest(server, port);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                break;
+        }
     }
 
     public static void concurrentTest(String serverIp, int port) throws InterruptedException {
