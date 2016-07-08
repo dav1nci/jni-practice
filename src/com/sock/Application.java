@@ -75,8 +75,8 @@ public class Application {
     }
 
     public static void testDBLSocket(String serverAddr, String clientAddr, int port){
-        DBLUDPSocket server = new DBLUDPSocket(new InetSocketAddress(serverAddr, 1)); // i don't use port in this version
-        DBLUDPSocket client = new DBLUDPSocket(new InetSocketAddress(clientAddr, 1));
+        DBLUDPSocket server = new DBLUDPSocket(new InetSocketAddress(serverAddr, 1), DBLUDPSocket.DBL_OPEN_THREADSAFE); // i don't use port in this version
+        DBLUDPSocket client = new DBLUDPSocket(new InetSocketAddress(clientAddr, 1), DBLUDPSocket.DBL_OPEN_THREADSAFE);
 
         server.bind(new InetSocketAddress(port));
 		client.bind(new InetSocketAddress(port + 1));

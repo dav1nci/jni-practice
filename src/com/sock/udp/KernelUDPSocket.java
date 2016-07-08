@@ -8,6 +8,7 @@ import java.nio.ByteOrder;
  * Created by stdima on 14.06.16.
  */
 public class KernelUDPSocket extends AbstractUDPSocket{
+    private int socketId;
 
     static {
         System.loadLibrary("kernel_udp");

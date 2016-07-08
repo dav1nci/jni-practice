@@ -17,27 +17,67 @@ JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_init
 
 /*
  * Class:     com_sock_udp_DBLUDPSocket
- * Method:    createSocketC
- * Signature: (I)I
+ * Method:    createDeviceC
+ * Signature: (II)I
  */
-JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_createSocketC
-  (JNIEnv *, jobject, jint);
+JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_createDeviceC
+  (JNIEnv *, jobject, jint, jint);
 
 /*
  * Class:     com_sock_udp_DBLUDPSocket
  * Method:    sendC
- * Signature: (I[BIII)V
+ * Signature: (I[BII)V
  */
 JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_sendC
-  (JNIEnv *, jobject, jint, jbyteArray, jint, jint, jint);
+  (JNIEnv *, jobject, jint, jbyteArray, jint, jint);
+
+/*
+ * Class:     com_sock_udp_DBLUDPSocket
+ * Method:    sendToC
+ * Signature: (III[BII)V
+ */
+JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_sendToC
+  (JNIEnv *, jobject, jint, jint, jint, jbyteArray, jint, jint);
+
+/*
+ * Class:     com_sock_udp_DBLUDPSocket
+ * Method:    sendConnectC
+ * Signature: (IIIII)I
+ */
+JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_sendConnectC
+  (JNIEnv *, jobject, jint, jint, jint, jint, jint);
 
 /*
  * Class:     com_sock_udp_DBLUDPSocket
  * Method:    bindC
- * Signature: (II)V
+ * Signature: (III)I
  */
-JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_bindC
-  (JNIEnv *, jobject, jint, jint);
+JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_bindC
+  (JNIEnv *, jobject, jint, jint, jint);
+
+/*
+ * Class:     com_sock_udp_DBLUDPSocket
+ * Method:    receiveFromC
+ * Signature: (IILcom/sock/udp/UDPPacket;I)V
+ */
+JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_receiveFromC
+  (JNIEnv *, jobject, jint, jint, jobject, jint);
+
+/*
+ * Class:     com_sock_udp_DBLUDPSocket
+ * Method:    shutdownC
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_shutdownC
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     com_sock_udp_DBLUDPSocket
+ * Method:    unbindC
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_unbindC
+  (JNIEnv *, jobject, jint);
 
 /*
  * Class:     com_sock_udp_DBLUDPSocket
@@ -46,22 +86,6 @@ JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_bindC
  */
 JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_closeC
   (JNIEnv *, jobject, jint);
-
-/*
- * Class:     com_sock_udp_DBLUDPSocket
- * Method:    receiveC
- * Signature: (ILcom/sock/udp/UDPPacket;I)V
- */
-JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_receiveC
-  (JNIEnv *, jobject, jint, jobject, jint);
-
-/*
- * Class:     com_sock_udp_DBLUDPSocket
- * Method:    connectC
- * Signature: (III)V
- */
-JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_connectC
-  (JNIEnv *, jobject, jint, jint, jint);
 
 #ifdef __cplusplus
 }

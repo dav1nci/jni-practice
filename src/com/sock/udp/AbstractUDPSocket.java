@@ -3,12 +3,14 @@ package com.sock.udp;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 /**
  * Created by stdima on 28.06.16.
  */
 public abstract class AbstractUDPSocket {
-	protected int socketId;
+
     protected InetAddress remoteAddress;
     protected int remotePort;
     protected InetAddress address;
@@ -46,5 +48,11 @@ public abstract class AbstractUDPSocket {
 
     public boolean isConnected() {
         return connected;
+    }
+
+    protected int hostToInt(SocketAddress address){
+        return ByteBuffer.wrap(((InetSocketAddress) address).getAddress().getAddress())
+                .order(ByteOrder.LITTLE_ENDIAN)
+                .getInt();
     }
 }
