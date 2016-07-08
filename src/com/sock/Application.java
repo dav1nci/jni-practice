@@ -24,12 +24,12 @@ public class Application {
             return;
         }
         //testSocket(server, client, port);
-        //testDBLSocket(local, remote, port);
-        try {
-            concurrentTest(server, port);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        testDBLSocket(server, client, port);
+        //try {
+        //    concurrentTest(server, port);
+        //} catch (InterruptedException e) {
+        //    e.printStackTrace();
+        //}
     }
 
     public static void concurrentTest(String serverIp, int port) throws InterruptedException {
@@ -74,15 +74,16 @@ public class Application {
         System.out.println();
     }
 
-    public static void testDBLSocket(String local, String remote, int port){
-        DBLUDPSocket server = new DBLUDPSocket(new InetSocketAddress(local, 1)); // i don't use port in this version
-        DBLUDPSocket client = new DBLUDPSocket(new InetSocketAddress(remote, 1));
+    public static void testDBLSocket(String serverAddr, String clientAddr, int port){
+        DBLUDPSocket server = new DBLUDPSocket(new InetSocketAddress(serverAddr, 1)); // i don't use port in this version
+        DBLUDPSocket client = new DBLUDPSocket(new InetSocketAddress(clientAddr, 1));
 
         server.bind(new InetSocketAddress(port));
+		client.bind(new InetSocketAddress(port + 1));
 
         String message = "Hello me name is Dima!";
-        int bufLen = 100;
-        UDPPacket packet = new UDPPacket(message.getBytes(), message.length(), new InetSocketAddress(local, 8888));
+        int bufLen = message.length();
+        UDPPacket packet = new UDPPacket(message.getBytes(), message.length(), new InetSocketAddress(serverAddr, port));
         UDPPacket response = new UDPPacket(new byte[bufLen], bufLen);
         client.send(packet);
         server.receive(response);
