@@ -73,6 +73,7 @@ JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_sendC(
         printf("C: Sending failed!\n");
         (*env) -> ThrowNew(env, excClass, "Sending Faied");
     }
+    (*env) -> ReleaseByteArrayElements(env, message, message_c, JNI_ABORT);
     //printf("C: Message sended\n");
 }
 
@@ -87,7 +88,7 @@ JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_bindC(JNIEnv *env, jobj
     if (bind((int)sockId, (struct sockaddr *) &sin, sizeof(sin)) < 0){
         char *className = "java/lang/Exception";
         jclass excClass = (*env) -> FindClass(env, className);
-        printf("C: Bind failed\n");
+        //printf("C: Bind failed\n");
         (*env) -> ThrowNew(env, excClass, "Bind failed");
     }
 }
@@ -128,6 +129,8 @@ JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_receiveC(JNIEnv *env, j
     jmethodID inet_addr_getByName = (*env) -> GetStaticMethodID(env, inet_address_class, "getByName", "(Ljava/lang/String;)Ljava/net/InetAddress;");
     jstring host = (*env) -> NewStringUTF(env, inet_ntoa(other.sin_addr));
     jobject inet_address = (*env) -> CallStaticObjectMethod(env, inet_address_class, inet_addr_getByName, host);
+
+    (*env) -> ReleaseStringUTFChars(env, host, NULL);
 
     jbyteArray message = (*env) -> NewByteArray(env, (int)buflen);
     (*env) -> SetByteArrayRegion(env, message, 0, (int)buflen, buf);

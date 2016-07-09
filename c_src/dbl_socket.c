@@ -69,6 +69,7 @@ JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_sendC(JNIEnv *env, jobject
     jboolean is_copy;
     char *buf_c = (*env) -> GetByteArrayElements(env, buf, &is_copy);
     DBL_Safe(dbl_send((*send_handles[handleId]), buf_c, (int)bufLen, flag));
+    (*env) -> ReleaseByteArrayElements(env, buf, buf_c, JNI_ABORT);
 }
 
 JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_sendToC(JNIEnv *env, jobject obj, jint channId, jint host, jint port, jbyteArray buf, jint bufLen, jint flag){

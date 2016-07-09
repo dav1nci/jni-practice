@@ -17,6 +17,7 @@ public class KernelUDPSocket extends AbstractUDPSocket{
 
     public KernelUDPSocket() {
         this.socketId = createSocketC();
+        this.closed = false;
     }
 
 

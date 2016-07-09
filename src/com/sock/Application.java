@@ -15,7 +15,7 @@ public class Application {
     public static void main(String[] args) throws UnknownHostException {
         String server, client;
 		int port;
-        if (args.length == 3){
+        if (args.length == 4){
             server = args[0];
             client= args[1];
 			port = Integer.parseInt(args[2]);

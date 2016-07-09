@@ -16,7 +16,7 @@ public abstract class AbstractUDPSocket {
     protected InetAddress address;
     protected int port;
     protected boolean bound = false;
-    protected boolean closed = false;
+    protected boolean closed = true;
     protected boolean connected = false;
 
     abstract public void send(UDPPacket packet);
@@ -50,9 +50,11 @@ public abstract class AbstractUDPSocket {
         return connected;
     }
 
-    protected int hostToInt(SocketAddress address){
+    public static int hostToInt(SocketAddress address){
         return ByteBuffer.wrap(((InetSocketAddress) address).getAddress().getAddress())
                 .order(ByteOrder.LITTLE_ENDIAN)
                 .getInt();
     }
+
+
 }

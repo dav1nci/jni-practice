@@ -28,15 +28,12 @@ public class ServerSocket implements Callable<String> {
         while(true){
             server.receive(buf);
             System.out.println("Server: message is \"" + new String(buf.getMessage()) + "\"");
-            System.out.println("Message comes from " + buf.getHost() + " port: " + buf.getPort());
             ByteBuffer b = ByteBuffer.allocate(4);
             b.order(ByteOrder.LITTLE_ENDIAN);
             b.putInt(buf.getHost());
             byte[] hostBytes = b.array();
-            for (byte i : hostBytes){
-                System.out.print(i + " ");
-            }
             InetAddress client = InetAddress.getByAddress(hostBytes);
+            System.out.println("Message comes from " + client.getHostAddress() + " port: " + buf.getPort());
             server.send(new UDPPacket(buf.getMessage(),
                     buf.getBufLen(),
                     new InetSocketAddress(client, buf.getPort())));

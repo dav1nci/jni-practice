@@ -36,6 +36,7 @@ public class DBLUDPSocket extends AbstractUDPSocket {
 
     public DBLUDPSocket(SocketAddress address, int flag) {
         this.deviceId = createDeviceC(hostToInt(address), flag);
+        this.closed = false;
     }
 
     public void send(UDPPacket packet, int flag) {
@@ -48,13 +49,13 @@ public class DBLUDPSocket extends AbstractUDPSocket {
 
     public void sendConnect(SocketAddress addr, int flag, int ttl){ // DBL sdk no flag supported for this method
         this.port = ((InetSocketAddress)addr).getPort();
-        this.address = ((InetSocketAddress) addr).getAddress();//!!!!!!!! NUllPointer
-        sendConnectC(this.channelId, hostToInt(addr), ((InetSocketAddress)addr).getPort(), flag, ttl);
+        this.address = ((InetSocketAddress) addr).getAddress();
+        this.sendHandleId = sendConnectC(this.channelId, AbstractUDPSocket.hostToInt(addr), ((InetSocketAddress)addr).getPort(), flag, ttl);
+        this.connected = true;
     }
 
     public void bind(SocketAddress addr, int flag) {
         this.port = ((InetSocketAddress)addr).getPort();
-        this.address = ((InetSocketAddress) addr).getAddress();//!!!!!!!! NUllPointer
         this.bound = true;
         this.channelId = bindC(this.deviceId, flag, ((InetSocketAddress) addr).getPort());
     }
@@ -96,6 +97,7 @@ public class DBLUDPSocket extends AbstractUDPSocket {
 
     public void unbind(){
         unbindC(this.channelId);
+        this.bound = false;
     }
 
     public void receive(UDPPacket packet, int receiveMode) {
