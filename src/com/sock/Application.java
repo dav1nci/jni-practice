@@ -84,16 +84,17 @@ public class Application {
     }
 
     public static void testDBLSocket(String serverAddr, String clientAddr, int port){
-        DBLUDPSocket server = new DBLUDPSocket(new InetSocketAddress(serverAddr, 1), DBLUDPSocket.DBL_OPEN_THREADSAFE); // i don't use port in this version
+        System.out.println("Test DBL socket");
+		DBLUDPSocket server = new DBLUDPSocket(new InetSocketAddress(serverAddr, 1), DBLUDPSocket.DBL_OPEN_THREADSAFE); // i don't use port in this version
         DBLUDPSocket client = new DBLUDPSocket(new InetSocketAddress(clientAddr, 1), DBLUDPSocket.DBL_OPEN_THREADSAFE);
-
         server.bind(new InetSocketAddress(port));
-		client.bind(new InetSocketAddress(port + 1));
+		//client.bind(new InetSocketAddress(port + 1));
 
         String message = "Hello me name is Dima!";
         int bufLen = message.length();
         UDPPacket packet = new UDPPacket(message.getBytes(), message.length(), new InetSocketAddress(serverAddr, port));
         UDPPacket response = new UDPPacket(new byte[bufLen], bufLen);
+		client.sendConnect(new InetSocketAddress(serverAddr, port), 0, 64);
         client.send(packet);
         server.receive(response);
         System.out.print("Java: ");
