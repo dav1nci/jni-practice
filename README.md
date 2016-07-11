@@ -4,11 +4,21 @@
 Run the following commands
 ```
 make
-make mj
+make lin #for linux
+make win #for Windows
 ```
 to clean all run 
 ```
-make clean
+make clean #for linux
+make clean-win #for Windows
+```
+to make executalbe jar run 
+```
+make jar
+```
+to run it run
+```
+make run
 ```
 test connect() mecthod with following console command
 ```
