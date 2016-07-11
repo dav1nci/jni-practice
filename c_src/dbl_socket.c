@@ -145,7 +145,7 @@ JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_receiveFromC(JNIEnv *env, 
 }
 
 JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_shutdownC(JNIEnv *env, jobject obj, jint devId){
-    DBL_Safe(dbl_shutdown((*devices[devId]), 0));
+    //DBL_Safe(dbl_shutdown((*devices[devId]), 0));
 }
 
 JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_unbindC(JNIEnv *env, jobject obj, jint channId){
