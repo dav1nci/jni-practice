@@ -10,7 +10,6 @@ import java.nio.ByteOrder;
  * Created by stdima on 28.06.16.
  */
 public abstract class AbstractUDPSocket {
-
     protected InetAddress remoteAddress;
     protected int remotePort;
     protected InetAddress address;
@@ -20,14 +19,17 @@ public abstract class AbstractUDPSocket {
     protected boolean connected = false;
 
     abstract public void send(UDPPacket packet);
-    abstract public void bind(SocketAddress addr);
+    abstract public void bind(SocketAddress addr) throws Exception;
     abstract public void connect(SocketAddress addr);
     abstract public void connect(InetAddress address, int port);
+    abstract public void disconnect();
     abstract public void close();
-    abstract public void receive(UDPPacket packet);
+    abstract public void receive(UDPPacket packet) throws Exception;
 
     public InetAddress getInetAddress() {
-        return remoteAddress;
+        if (connected)
+            return remoteAddress;
+        return null;
     }
 
     public InetAddress getLocalSocketAddress() {
@@ -35,7 +37,17 @@ public abstract class AbstractUDPSocket {
     }
 
     public int getLocalPort() {
-        return port;
+        if (bound)
+            return port;
+        else if (closed)
+            return -1;
+        return 0;
+    }
+
+    public int getPort(){
+        if (connected)
+            return remotePort;
+        return -1;
     }
 
     public boolean isBound() {

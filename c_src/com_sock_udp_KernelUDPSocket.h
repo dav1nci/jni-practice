@@ -55,6 +55,14 @@ JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_receiveC
 JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_connectC
   (JNIEnv *, jobject, jint, jint, jint);
 
+/*
+ * Class:     com_sock_udp_KernelUDPSocket
+ * Method:    disconnectC
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_disconnectC
+  (JNIEnv *, jobject, jint);
+
 #ifdef __cplusplus
 }
 #endif

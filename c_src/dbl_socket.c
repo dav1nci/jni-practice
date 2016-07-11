@@ -42,7 +42,7 @@ enum dbl_recvmode rmode = DBL_RECV_DEFAULT;
 JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_init(JNIEnv *env, jclass class){
     char *desc = "Description:\n\tdbl_pingpong\n\tMeasures UDP pingpong latency using the DBL API.\n\tWhen the client and server machines are connected back-to-back (switchless),\n\tthe expected half-round trip latency is 3 to 4 microseconds.\n\nExample:\n\t[server]\n\t\t./dbl_pingpong -s -l 192.168.1.1 -p 3333 -i 10000\n\n\t[client]\n\t\t./dbl_pingpong -h 192.168.1.1 -l 192.168.1.2 -p 3333 -i 10000\n";
     printf("Description: \n%s", desc);
-    int a = dbl_init(DBL_VERSION_API);
+    DBL_Safe(dbl_init(DBL_VERSION_API));
 }
 
 JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_createDeviceC(JNIEnv *env, jobject obj, jint host, jint flag){
@@ -163,9 +163,16 @@ JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_shutdownC(JNIEnv *env, job
 }
 
 JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_unbindC(JNIEnv *env, jobject obj, jint channId){
+    printf("C: Try to dbl_unbind()\n");
     DBL_Safe(dbl_unbind((*channels[channId])));
 }
 
 JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_closeC(JNIEnv *env, jobject obj, jint devId){
+    printf("C: Try to dbl_close()\n");
     DBL_Safe(dbl_close((*devices[devId])));
+}
+
+JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_sendDisconnect(JNIEnv *env, jobject obj, jint handleId){
+    printf("C: Try to dbl_send_disconnect()\n");
+    DBL_Safe(dbl_send_disconnect((*send_handles[(int)handleId])));
 }

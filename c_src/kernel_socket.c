@@ -154,3 +154,11 @@ JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_connectC(JNIEnv *env, j
         (*env) -> ThrowNew(env, excClass, "Connection failed");
     }
 }
+
+JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_disconnectC(JNIEnv *env, jobject obj, jint sockId){
+#ifdef _WIN32
+    shutdown(sockId, SD_SEND);
+#else
+    shutdown(sockId, SHUT_RDWR);
+#endif
+}

@@ -20,6 +20,13 @@ public class KernelUDPSocket extends AbstractUDPSocket{
         this.closed = false;
     }
 
+    public KernelUDPSocket(int port){
+        this.socketId = createSocketC();
+        this.closed = false;
+        this.bind(new InetSocketAddress("127.0.0.1", port));
+        this.bound = true;
+    }
+
 
     @Override
     public void send(UDPPacket packet){
@@ -58,6 +65,11 @@ public class KernelUDPSocket extends AbstractUDPSocket{
     }
 
     @Override
+    public void disconnect() {
+        disconnectC(this.socketId);
+    }
+
+    @Override
     public void close(){
         this.closed = true;
         closeC(this.socketId);
@@ -74,5 +86,6 @@ public class KernelUDPSocket extends AbstractUDPSocket{
     private native void closeC(int sockId);
     private native void receiveC(int sockId, UDPPacket packet, int buflen);
     private native void connectC(int sockId, int host, int port);
+    private native void disconnectC(int sockId);
 
 }

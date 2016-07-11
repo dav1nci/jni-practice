@@ -12,7 +12,7 @@ import java.util.concurrent.*;
 
 public class Application {
 
-    public static void main(String[] args) throws UnknownHostException {
+    public static void main(String[] args) throws Exception {
         String server, client;
 		int port;
         if (args.length == 4){
@@ -83,18 +83,22 @@ public class Application {
         System.out.println();
     }
 
-    public static void testDBLSocket(String serverAddr, String clientAddr, int port){
+    public static void testDBLSocket(String serverAddr, String clientAddr, int port) throws Exception {
         System.out.println("Test DBL socket");
-		DBLUDPSocket server = new DBLUDPSocket(new InetSocketAddress(serverAddr, 1), DBLUDPSocket.DBL_OPEN_THREADSAFE); // 1 in port parameter ignored
-        DBLUDPSocket client = new DBLUDPSocket(new InetSocketAddress(clientAddr, 1), DBLUDPSocket.DBL_OPEN_THREADSAFE);
-        server.bind(new InetSocketAddress(port), 0);
-		client.bind(new InetSocketAddress(port + 1), 0);
-
+		DBLUDPSocket server = new DBLUDPSocket(new InetSocketAddress(serverAddr, 0), DBLUDPSocket.DBL_OPEN_THREADSAFE); // 0 in port parameter ignored
+        DBLUDPSocket client = new DBLUDPSocket(new InetSocketAddress(clientAddr, 0), DBLUDPSocket.DBL_OPEN_THREADSAFE);
+        try {
+            server.setBindFlag(DBLUDPSocket.DBL_BIND_REUSEADDR);
+            server.bind(new InetSocketAddress(port));
+            client.bind(new InetSocketAddress(port + 1));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         String message = "Hello me name is Dima!";
         int bufLen = message.length();
         UDPPacket packet = new UDPPacket(message.getBytes(), message.length(), new InetSocketAddress(serverAddr, port));
         UDPPacket response = new UDPPacket(new byte[bufLen], bufLen);
-		client.sendConnect(new InetSocketAddress(serverAddr, port), 0, 0);
+		client.connect(new InetSocketAddress(serverAddr, port));
         client.send(packet);
         server.receive(response);
         System.out.print("Java: ");

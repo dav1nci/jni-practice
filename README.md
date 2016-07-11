@@ -1,5 +1,5 @@
 ###my socket in C + Java
-######This code works well on linux
+######This code works well on linux and Windows
 
 Run the following commands
 ```

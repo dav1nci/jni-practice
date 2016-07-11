@@ -81,6 +81,14 @@ JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_unbindC
 
 /*
  * Class:     com_sock_udp_DBLUDPSocket
+ * Method:    sendDisconnect
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_sendDisconnect
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     com_sock_udp_DBLUDPSocket
  * Method:    closeC
  * Signature: (I)V
  */
