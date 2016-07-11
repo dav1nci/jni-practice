@@ -39,10 +39,10 @@ int send_handles_num = 0;
 
 enum dbl_recvmode rmode = DBL_RECV_DEFAULT;
 
-JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_init(JNIEnv *env, jclass class){
-    char *desc = "Description:\n\tdbl_pingpong\n\tMeasures UDP pingpong latency using the DBL API.\n\tWhen the client and server machines are connected back-to-back (switchless),\n\tthe expected half-round trip latency is 3 to 4 microseconds.\n\nExample:\n\t[server]\n\t\t./dbl_pingpong -s -l 192.168.1.1 -p 3333 -i 10000\n\n\t[client]\n\t\t./dbl_pingpong -h 192.168.1.1 -l 192.168.1.2 -p 3333 -i 10000\n";
-    printf("Description: \n%s", desc);
-    DBL_Safe(dbl_init(DBL_VERSION_API));
+JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_init(JNIEnv *env, jclass class){
+    //char *desc = "Description:\n\tdbl_pingpong\n\tMeasures UDP pingpong latency using the DBL API.\n\tWhen the client and server machines are connected back-to-back (switchless),\n\tthe expected half-round trip latency is 3 to 4 microseconds.\n\nExample:\n\t[server]\n\t\t./dbl_pingpong -s -l 192.168.1.1 -p 3333 -i 10000\n\n\t[client]\n\t\t./dbl_pingpong -h 192.168.1.1 -l 192.168.1.2 -p 3333 -i 10000\n";
+    //printf("Description: \n%s", desc);
+    return dbl_init(DBL_VERSION_API);
 }
 
 JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_createDeviceC(JNIEnv *env, jobject obj, jint host, jint flag){

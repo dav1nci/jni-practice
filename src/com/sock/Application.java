@@ -7,7 +7,6 @@ import com.sock.udp.UDPPacket;
 import com.sock.udp.KernelUDPSocket;
 
 import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 import java.util.concurrent.*;
 
 public class Application {
@@ -85,6 +84,7 @@ public class Application {
 
     public static void testDBLSocket(String serverAddr, String clientAddr, int port) throws Exception {
         System.out.println("Test DBL socket");
+        //clientAddr = "127.0.0.1";
 		DBLUDPSocket server = new DBLUDPSocket(new InetSocketAddress(serverAddr, 0), DBLUDPSocket.DBL_OPEN_THREADSAFE); // 0 in port parameter ignored
         DBLUDPSocket client = new DBLUDPSocket(new InetSocketAddress(clientAddr, 0), DBLUDPSocket.DBL_OPEN_THREADSAFE);
         try {

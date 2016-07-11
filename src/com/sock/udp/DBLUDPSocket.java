@@ -3,16 +3,28 @@ package com.sock.udp;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created by stdima on 28.06.16.
  */
 public class DBLUDPSocket extends AbstractUDPSocket {
-    private static Map<String, Integer> ipInUse;
+    private static int initStatus;
+
+    static {
+        System.loadLibrary("dbl_udp");
+        initStatus = init();
+    }
+
+    static boolean checkInit(){
+        if (initStatus != 0)
+            return false;
+        return true;
+    }
+
+    private static Map<String, Integer> ipInUse = new HashMap<>(2); // 2 is random number of amount of devices
+
     // dbl_open() flags
     public static int DBL_OPEN_THREADSAFE = 1;
     public static int DBL_OPEN_DISABLED  = 2;
@@ -36,10 +48,7 @@ public class DBLUDPSocket extends AbstractUDPSocket {
     private int bindFlag = -1;
     private int recvMode = -1;
 
-    static {
-        System.loadLibrary("dbl_udp");
-        init();
-    }
+
 
     public DBLUDPSocket(SocketAddress address, int flag) {
         if (!ipInUse.containsKey(((InetSocketAddress) address).getHostString())){
@@ -49,14 +58,6 @@ public class DBLUDPSocket extends AbstractUDPSocket {
             this.deviceId = ipInUse.get(((InetSocketAddress) address).getHostString());
         }
         this.closed = false;
-    }
-
-    public void send(UDPPacket packet, int flag) {
-        sendC(this.sendHandleId, packet.getMessage(), packet.getBufLen(), flag);
-    }
-
-    public void sendTo(UDPPacket packet, int flag){
-        sendToC(this.channelId, packet.getHost(), packet.getPort(), packet.getMessage(), packet.getBufLen(), flag);
     }
 
     @Override
@@ -131,7 +132,7 @@ public class DBLUDPSocket extends AbstractUDPSocket {
         this.recvMode = recvMode;
     }
 
-    private static native void init();
+    private static native int init();
     private native int createDeviceC(int host, int flag);
     private native void sendC(int handleId, byte[] buf, int bufLen, int flag);
     private native void sendToC(int channId, int host, int port, byte[] buf, int bufLen, int flag);

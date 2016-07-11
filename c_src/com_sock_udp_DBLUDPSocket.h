@@ -10,9 +10,9 @@ extern "C" {
 /*
  * Class:     com_sock_udp_DBLUDPSocket
  * Method:    init
- * Signature: ()V
+ * Signature: ()I
  */
-JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_init
+JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_init
   (JNIEnv *, jclass);
 
 /*

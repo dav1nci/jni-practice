@@ -14,7 +14,6 @@ public class KernelUDPSocket extends AbstractUDPSocket{
         System.loadLibrary("kernel_udp");
     }
 
-
     public KernelUDPSocket() {
         this.socketId = createSocketC();
         this.closed = false;
@@ -26,7 +25,6 @@ public class KernelUDPSocket extends AbstractUDPSocket{
         this.bind(new InetSocketAddress("127.0.0.1", port));
         this.bound = true;
     }
-
 
     @Override
     public void send(UDPPacket packet){
