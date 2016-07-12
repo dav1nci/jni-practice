@@ -78,7 +78,7 @@ JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_createDeviceC(JNIEnv *env,
 JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_sendC(JNIEnv *env, jobject obj, jint handleId, jbyteArray buf, jint bufLen, jint flag){
     jboolean is_copy;
     char *buf_c = (*env) -> GetByteArrayElements(env, buf, &is_copy);
-    printf("C: try to send a message: %s", buf_c);
+    printf("C: try to send a message: %s with send_handles_id = %d\n", buf_c, handleId);
     DBL_Safe(dbl_send((*send_handles[handleId]), buf_c, (int)bufLen, flag));
     (*env) -> ReleaseByteArrayElements(env, buf, buf_c, JNI_ABORT);
 }
@@ -145,7 +145,9 @@ JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_receiveFromC(JNIEnv *env, 
     char buf[(int)bufLen];
     struct dbl_recv_info rxinfo;
     enum dbl_recvmode rmode = recvMode;
+	printf("C: Try to dbl_recvfrom() from dev = %d\n", (int)devId);
     DBL_Safe(dbl_recvfrom((*devices[(int)devId]), rmode, buf, bufLen, &rxinfo));
+	printf("C: After dbl_recvfrom() from dev = %d\n", (int)devId);
     jclass udp_packet_class = (*env) -> GetObjectClass(env, packet);
 
     jfieldID fidAddress = (*env) -> GetFieldID(env, udp_packet_class, "address", "Ljava/net/InetAddress;");

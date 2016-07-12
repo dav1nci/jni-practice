@@ -85,11 +85,11 @@ public class Application {
     public static void testDBLSocket(String serverAddr, String clientAddr, int port) throws Exception {
         System.out.println("Test DBL socket");
         //clientAddr = "127.0.0.1";
-		DBLUDPSocket server = new DBLUDPSocket(new InetSocketAddress(serverAddr, 0), DBLUDPSocket.DBL_OPEN_THREADSAFE); // 0 in port parameter ignored
+		//DBLUDPSocket server = new DBLUDPSocket(new InetSocketAddress(serverAddr, 0), DBLUDPSocket.DBL_OPEN_THREADSAFE); // 0 in port parameter ignored
         DBLUDPSocket client = new DBLUDPSocket(new InetSocketAddress(clientAddr, 0), DBLUDPSocket.DBL_OPEN_THREADSAFE);
         try {
-            server.setBindFlag(DBLUDPSocket.DBL_BIND_REUSEADDR);
-            server.bind(new InetSocketAddress(port));
+            //server.setBindFlag(DBLUDPSocket.DBL_BIND_REUSEADDR);
+            //server.bind(new InetSocketAddress(port));
             client.bind(new InetSocketAddress(port + 1));
         } catch (Exception e) {
             e.printStackTrace();
@@ -100,7 +100,7 @@ public class Application {
         UDPPacket response = new UDPPacket(new byte[bufLen], bufLen);
 		client.connect(new InetSocketAddress(serverAddr, port));
         client.send(packet);
-        server.receive(response);
+        //server.receive(response);
         System.out.print("Java: ");
         for (byte i : response.getMessage())
             System.out.print((char)i);
