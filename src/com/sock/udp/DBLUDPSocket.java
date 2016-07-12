@@ -38,6 +38,8 @@ public class DBLUDPSocket extends AbstractUDPSocket {
 
     // dbl_sendto() and dbl_send() flags
     public static int DBL_NONBLOCK = 4;
+	
+	 public static int DBL_RECV_DEFAULT = 0;
 
 
     private int deviceId;

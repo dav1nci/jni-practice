@@ -100,6 +100,7 @@ public class Application {
         UDPPacket response = new UDPPacket(new byte[bufLen], bufLen);
 		client.connect(new InetSocketAddress(serverAddr, port));
         client.send(packet);
+		//server.setRecvMode(DBLUDPSocket.DBL_RECV_DEFAULT);
         //server.receive(response);
         System.out.print("Java: ");
         for (byte i : response.getMessage())
