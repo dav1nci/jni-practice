@@ -92,6 +92,7 @@ public class DBLUDPSocket extends AbstractUDPSocket {
     @Override
     public void connect(InetAddress address, int port) {
         this.connect(new InetSocketAddress(address.getHostAddress(), port));
+		this.connected = true;
     }
 
     @Override

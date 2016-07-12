@@ -47,7 +47,7 @@ enum dbl_recvmode rmode = DBL_RECV_DEFAULT;
 JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_init(JNIEnv *env, jclass class){
     //char *desc = "Description:\n\tdbl_pingpong\n\tMeasures UDP pingpong latency using the DBL API.\n\tWhen the client and server machines are connected back-to-back (switchless),\n\tthe expected half-round trip latency is 3 to 4 microseconds.\n\nExample:\n\t[server]\n\t\t./dbl_pingpong -s -l 192.168.1.1 -p 3333 -i 10000\n\n\t[client]\n\t\t./dbl_pingpong -h 192.168.1.1 -l 192.168.1.2 -p 3333 -i 10000\n";
     //printf("Description: \n%s", desc);
-	printf("%d\n", DBL_VERSION_API);
+	printf("Try to dbl_init()\n");
     DBL_Safe(dbl_init(DBL_VERSION_API));
 	return 0;
 }
@@ -62,6 +62,8 @@ JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_createDeviceC(JNIEnv *env,
 #else
     sin.sin_addr.s_addr = (int)host;
 #endif
+	printf("C: Create device with host %d\n", host);
+
 
     // Get memory for new device
     devices = (dbl_device_t **) realloc(devices, (devices_num + 1) * sizeof(dbl_device_t *));
@@ -78,7 +80,7 @@ JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_createDeviceC(JNIEnv *env,
 JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_sendC(JNIEnv *env, jobject obj, jint handleId, jbyteArray buf, jint bufLen, jint flag){
     jboolean is_copy;
     char *buf_c = (*env) -> GetByteArrayElements(env, buf, &is_copy);
-    printf("C: try to send a message: %s with send_handles_id = %d\n", buf_c, handleId);
+    printf("C: try to dbl_send() message: %s with send_handles_id = %d\n", buf_c, handleId);
     DBL_Safe(dbl_send((*send_handles[handleId]), buf_c, (int)bufLen, flag));
     (*env) -> ReleaseByteArrayElements(env, buf, buf_c, JNI_ABORT);
 }
@@ -97,7 +99,8 @@ JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_sendToC(JNIEnv *env, jobje
 
     jboolean is_copy;
     char *buf_c = (*env) -> GetByteArrayElements(env, buf, &is_copy);
-    DBL_Safe(dbl_sendto((*channels[channId]), &remote, buf_c, (int)bufLen, flag));
+	printf("C: try to dbl_send_to() message: %s with channId = %d host = %d, port = %d flag = %d\n", buf_c, channId, host, port, 0);
+    DBL_Safe(dbl_sendto((*channels[channId]), &remote, buf_c, (int)bufLen, 0));
 }
 
 JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_sendConnectC(JNIEnv *env, jobject obj, jint channId, jint host, jint port, jint flag, jint ttl){

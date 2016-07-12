@@ -65,17 +65,17 @@ public class Application {
 
     public static void testSocket(String server, String client, int port){
         KernelUDPSocket s1 = new KernelUDPSocket();
-        KernelUDPSocket s2 = new KernelUDPSocket();
+        //KernelUDPSocket s2 = new KernelUDPSocket();
 
         String message = "Hello me name is Dima!";
         UDPPacket packet = new UDPPacket(message.getBytes(), message.length(), new InetSocketAddress(server, port));
 
         int bufLen = 100;
         UDPPacket response = new UDPPacket(new byte[bufLen], bufLen);
-        s2.bind(new InetSocketAddress(server, port));
+        //s2.bind(new InetSocketAddress(server, port));
         //s2.connect(new InetSocketAddress("127.0.0.1", 50403));
         s1.send(packet);
-        s2.receive(response);
+        //s2.receive(response);
         System.out.print("Java: ");
         for (byte i : response.getMessage())
             System.out.print((char)i);
@@ -90,7 +90,7 @@ public class Application {
         try {
             //server.setBindFlag(DBLUDPSocket.DBL_BIND_REUSEADDR);
             //server.bind(new InetSocketAddress(port));
-            client.bind(new InetSocketAddress(port + 1));
+            client.bind(new InetSocketAddress(port));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -98,7 +98,9 @@ public class Application {
         int bufLen = message.length();
         UDPPacket packet = new UDPPacket(message.getBytes(), message.length(), new InetSocketAddress(serverAddr, port));
         UDPPacket response = new UDPPacket(new byte[bufLen], bufLen);
+		System.out.println("Java: try to client.connect()");
 		client.connect(new InetSocketAddress(serverAddr, port));
+		System.out.println("Java: try to client.send()");
         client.send(packet);
 		//server.setRecvMode(DBLUDPSocket.DBL_RECV_DEFAULT);
         //server.receive(response);
