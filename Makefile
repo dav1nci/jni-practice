@@ -53,3 +53,6 @@ jar:
 
 run:
 	java -Djava.library.path=lib/ -jar UDP.jar 10.115.66.185 10.115.55.185 8888 2
+
+ex:
+	gcc dbl_pingpong.c -o ex.exe -I"C:\DBL_Myri-10G\include" -I"C:\DBL_Myri-10G\share\doc\examples" -L"C:\DBL_Myri-10G\lib" -ldbl -Wl,-rpath="C:\DBL_Myri-10G\lib"

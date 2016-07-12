@@ -12,6 +12,10 @@
 #include <dbl.h>
 #include "com_sock_udp_DBLUDPSocket.h"
 
+//#ifdef _WIN32
+//#pragma comment(lib, "ws2_32.lib")
+//#endif
+
 #define DBL_Safe(x) do {                              \
     int ret = (x);                                    \
     if (ret != 0) {                                   \
@@ -25,13 +29,14 @@ typedef int bool;
 #define true 1
 #define false 0
 
-//#ifdef _WIN32
-//#pragma comment(lib, "ws2_32.lib")
-//#endif
+#ifdef _WIN32
+#pragma comment(lib, "ws2_32.lib")
+#endif
 
 dbl_device_t **devices;
 dbl_channel_t **channels;
 dbl_send_t **send_handles;
+dbl_device_t dev;
 
 int channels_num = 0;
 int devices_num = 0;
@@ -42,7 +47,9 @@ enum dbl_recvmode rmode = DBL_RECV_DEFAULT;
 JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_init(JNIEnv *env, jclass class){
     //char *desc = "Description:\n\tdbl_pingpong\n\tMeasures UDP pingpong latency using the DBL API.\n\tWhen the client and server machines are connected back-to-back (switchless),\n\tthe expected half-round trip latency is 3 to 4 microseconds.\n\nExample:\n\t[server]\n\t\t./dbl_pingpong -s -l 192.168.1.1 -p 3333 -i 10000\n\n\t[client]\n\t\t./dbl_pingpong -h 192.168.1.1 -l 192.168.1.2 -p 3333 -i 10000\n";
     //printf("Description: \n%s", desc);
-    return dbl_init(DBL_VERSION_API);
+	printf("%d\n", DBL_VERSION_API);
+    DBL_Safe(dbl_init(DBL_VERSION_API));
+	return 0;
 }
 
 JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_createDeviceC(JNIEnv *env, jobject obj, jint host, jint flag){
@@ -62,9 +69,8 @@ JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_createDeviceC(JNIEnv *env,
 
 
     // Create a new dvice
-    printf("C: Try dbl_open()\n");
-    dbl_open(&sin.sin_addr, 0, devices[devices_num]);
-
+    printf("C: Try dbl_open() dev num is : %d\n", devices_num);
+    DBL_Safe(dbl_open(&sin.sin_addr, 0, devices[devices_num]));
     devices_num++;
     return devices_num - 1;
 }
@@ -115,8 +121,8 @@ JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_sendConnectC(JNIEnv *env, 
     //dbl_send_t sh;
     //printf("C: try to dbl_dind() test\n");
     //DBL_Safe(dbl_bind((*devices[0]), 0, (int)port + 1, NULL, &ch));
-    printf("C: Try to dbl_send_connect()\n");
-    DBL_Safe(dbl_send_connect((*channels[(int)channId]), &remote, (int)flag, (int)ttl, send_handles[send_handles_num - 1]));
+    printf("C: Try to dbl_send_connect() on channelId = %d, send_handles = %d\n", (int)channId, (send_handles_num - 1));
+    DBL_Safe(dbl_send_connect((*channels[(int)channId]), &remote, 0, 0, send_handles[send_handles_num - 1]));
     //DBL_Safe(dbl_send_connect(ch, &remote, 0, 0, &sh));
     return send_handles_num - 1;
 }
@@ -127,8 +133,10 @@ JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_bindC(JNIEnv *env, jobject
     channels = (dbl_channel_t **) realloc(channels, (channels_num + 1) * sizeof(dbl_channel_t *));
     channels[channels_num] = (dbl_channel_t *) malloc(sizeof(dbl_channel_t));
     channels_num++;
-    printf("C: Try to dbl_bind() on port %d\n", port);
-    DBL_Safe(dbl_bind((*devices[(int)devId]), flag, (int)port, NULL, channels[channels_num - 1]));
+    printf("C: Try to dbl_bind() on port %d with device %d\n", port, (int)devId);
+    DBL_Safe(dbl_bind((*devices[(int)devId]), 0, (int)port, NULL, channels[channels_num - 1]));
+	//dbl_channel_t ch;
+	//DBL_Safe(dbl_bind(dev, 0, (int)port, NULL, &ch));
     return channels_num - 1;
 }
 

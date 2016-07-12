@@ -71,14 +71,14 @@ public class DBLUDPSocket extends AbstractUDPSocket {
 
     @Override
     public void bind(SocketAddress addr) throws Exception {
-        if (bound)
-            throw new Exception("Socket already bound to port " + this.getLocalPort());
-        if (bindFlag != -1) {
+        //if (bound)
+        //    throw new Exception("Socket already bound to port " + this.getLocalPort());
+        //if (bindFlag == -1) {
             this.port = ((InetSocketAddress) addr).getPort();
             this.bound = true;
             this.channelId = bindC(this.deviceId, this.bindFlag, ((InetSocketAddress) addr).getPort());
-        }else
-            throw new Exception("Bind flag is not specified");
+        //}else
+        //    throw new Exception("Bind flag is not specified");
     }
 
     @Override
