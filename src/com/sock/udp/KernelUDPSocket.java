@@ -38,20 +38,17 @@ public class KernelUDPSocket extends AbstractUDPSocket{
         this.bound = true;
         bindC(
                 this.socketId,
-                ByteBuffer.wrap(address.getAddress()).order(ByteOrder.LITTLE_ENDIAN).getInt(), //host in int32
+                hostToInt(addr),
                 ((InetSocketAddress) addr).getPort()
         );
     }
 
     @Override
     public void connect(SocketAddress addr){
-        int host = ByteBuffer.wrap(((InetSocketAddress) addr).getAddress().getAddress())
-                .order(ByteOrder.LITTLE_ENDIAN)
-                .getInt();
         this.remoteAddress = ((InetSocketAddress) addr).getAddress();
         this.remotePort = ((InetSocketAddress) addr).getPort();
         this.connected = true;
-        connectC(this.socketId, host, ((InetSocketAddress) addr).getPort());
+        connectC(this.socketId, hostToInt(addr), ((InetSocketAddress) addr).getPort());
     }
 
     @Override
@@ -59,7 +56,7 @@ public class KernelUDPSocket extends AbstractUDPSocket{
         this.remoteAddress = address;
         this.remotePort = port;
         this.connected = true;
-        connectC(this.socketId, ByteBuffer.wrap(address.getAddress()).order(ByteOrder.LITTLE_ENDIAN).getInt(), port);
+        connectC(this.socketId, hostToInt(address), port);
     }
 
     @Override
@@ -78,6 +75,33 @@ public class KernelUDPSocket extends AbstractUDPSocket{
         receiveC(this.socketId, packet, packet.getBufLen());
     }
 
+    @Override
+    public void setReuseAddress(boolean on) {
+
+    }
+
+    @Override
+    public void joinGroup(InetAddress mcastaddr) {
+
+    }
+
+    @Override
+    public void joinGroup(SocketAddress mcastaddr, NetworkInterface netIf) throws Exception {
+        if (!this.isBound())
+            throw new Exception("Socket not bound to a port");
+        joinMcastGroupC(this.socketId, hostToInt(mcastaddr), hostToInt(netIf.getInetAddresses().nextElement()));
+    }
+
+    @Override
+    public void leaveGroup(InetAddress mcastaddr) {
+
+    }
+
+    @Override
+    public void leaveGroup(SocketAddress mcastaddr, NetworkInterface netIf) {
+
+    }
+
     private native int createSocketC();
     private native void sendC(int sockId, byte[] buf, int len, int host, int port);
     private native void bindC(int sockId, int host, int port);
@@ -85,5 +109,6 @@ public class KernelUDPSocket extends AbstractUDPSocket{
     private native void receiveC(int sockId, UDPPacket packet, int buflen);
     private native void connectC(int sockId, int host, int port);
     private native void disconnectC(int sockId);
+    private native void joinMcastGroupC(int sockId, int mcastGroup, int _interface);
 
 }

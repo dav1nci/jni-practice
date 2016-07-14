@@ -65,14 +65,14 @@ public class Application {
 
     public static void testSocket(String server, String client, int port){
         KernelUDPSocket s1 = new KernelUDPSocket();
-        //KernelUDPSocket s2 = new KernelUDPSocket();
+        KernelUDPSocket s2 = new KernelUDPSocket();
 
         String message = "Hello me name is Dima!";
         UDPPacket packet = new UDPPacket(message.getBytes(), message.length(), new InetSocketAddress(server, port));
 
         int bufLen = 100;
         UDPPacket response = new UDPPacket(new byte[bufLen], bufLen);
-        //s2.bind(new InetSocketAddress(server, port));
+        s2.bind(new InetSocketAddress(server, port));
         //s2.connect(new InetSocketAddress("127.0.0.1", 50403));
         s1.send(packet);
         //s2.receive(response);

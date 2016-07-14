@@ -57,11 +57,59 @@ JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_bindC
 
 /*
  * Class:     com_sock_udp_DBLUDPSocket
+ * Method:    bindAddrC
+ * Signature: (IIII)I
+ */
+JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_bindAddrC
+  (JNIEnv *, jobject, jint, jint, jint, jint);
+
+/*
+ * Class:     com_sock_udp_DBLUDPSocket
  * Method:    receiveFromC
  * Signature: (IILcom/sock/udp/UDPPacket;I)V
  */
 JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_receiveFromC
   (JNIEnv *, jobject, jint, jint, jobject, jint);
+
+/*
+ * Class:     com_sock_udp_DBLUDPSocket
+ * Method:    mcastJoinC
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_mcastJoinC
+  (JNIEnv *, jobject, jint, jint);
+
+/*
+ * Class:     com_sock_udp_DBLUDPSocket
+ * Method:    mcastLeaveC
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_mcastLeaveC
+  (JNIEnv *, jobject, jint, jint);
+
+/*
+ * Class:     com_sock_udp_DBLUDPSocket
+ * Method:    deviceGetAttrsC
+ * Signature: (ILcom/sock/udp/DeviceAttributes;)V
+ */
+JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_deviceGetAttrsC
+  (JNIEnv *, jobject, jint, jobject);
+
+/*
+ * Class:     com_sock_udp_DBLUDPSocket
+ * Method:    deviceSetAttrsC
+ * Signature: (IIII)V
+ */
+JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_deviceSetAttrsC
+  (JNIEnv *, jobject, jint, jint, jint, jint);
+
+/*
+ * Class:     com_sock_udp_DBLUDPSocket
+ * Method:    deviceEnableC
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_deviceEnableC
+  (JNIEnv *, jobject, jint);
 
 /*
  * Class:     com_sock_udp_DBLUDPSocket
@@ -81,10 +129,10 @@ JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_unbindC
 
 /*
  * Class:     com_sock_udp_DBLUDPSocket
- * Method:    sendDisconnect
+ * Method:    sendDisconnectC
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_sendDisconnect
+JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_sendDisconnectC
   (JNIEnv *, jobject, jint);
 
 /*

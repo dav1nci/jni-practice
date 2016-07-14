@@ -63,6 +63,14 @@ JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_connectC
 JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_disconnectC
   (JNIEnv *, jobject, jint);
 
+/*
+ * Class:     com_sock_udp_KernelUDPSocket
+ * Method:    joinMcastGroupC
+ * Signature: (III)V
+ */
+JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_joinMcastGroupC
+  (JNIEnv *, jobject, jint, jint, jint);
+
 #ifdef __cplusplus
 }
 #endif
