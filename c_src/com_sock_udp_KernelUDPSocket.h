@@ -103,6 +103,14 @@ JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_leaveMcastGroup
 JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_setReuseAddrC
   (JNIEnv *, jobject, jint, jint);
 
+/*
+ * Class:     com_sock_udp_KernelUDPSocket
+ * Method:    setTimeout
+ * Signature: (III)V
+ */
+JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_setTimeout
+  (JNIEnv *, jobject, jint, jint, jint);
+
 #ifdef __cplusplus
 }
 #endif

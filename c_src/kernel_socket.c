@@ -215,7 +215,15 @@ JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_joinMcastGroupC(JNIEnv 
 }
 
 JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_leaveMcastGroup(JNIEnv *env, jobject obj, jint sockId, jint mcastIp, jint interfaceIp){
-
+    struct ip_mreq group;
+    group.imr_multiaddr.s_addr = mcastIp;
+    group.imr_interface.s_addr = interfaceIp;
+    if (setsockopt(sockId, IPPROTO_IP, IP_DROP_MEMBERSHIP, (char *) &group, sizeof(group)) < 0){
+        char *className = "java/lang/Exception";
+        jclass excClass = (*env) -> FindClass(env, className);
+        printf("C: removing socket from mcast group faied\n");
+        (*env) -> ThrowNew(env, excClass, "Removing socket from mcast group faied");
+    }
 }
 
 JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_setReuseAddrC(JNIEnv *env, jobject obj, jint sockId, jint flag){
@@ -225,5 +233,22 @@ JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_setReuseAddrC(JNIEnv *e
         jclass excClass = (*env) -> FindClass(env, className);
         printf("C: SET SO_REUSEADDR failed\n");
         (*env) -> ThrowNew(env, excClass, "Set SO_REUSEADDR failed");
+    }
+}
+
+JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_setTimeout(JNIEnv *env, jobject obj, jint sockId, jint n, jint flag){
+    struct timeval tv;
+    if (flag == 0){
+        tv.tv_sec = n;
+        tv.tv_usec = 0;
+    } else {
+        tv.tv_sec = 0;
+        tv.tv_usec = n;
+    }
+    if (setsockopt(sockId, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0){
+        char *className = "java/lang/Exception";
+        jclass excClass = (*env) -> FindClass(env, className);
+        printf("C: setting timeout failed\n");
+        (*env) -> ThrowNew(env, excClass, "Setting timeout failed");
     }
 }

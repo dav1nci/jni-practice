@@ -3,6 +3,7 @@ package com.sock.udp;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by stdima on 14.06.16.
@@ -101,6 +102,19 @@ public class KernelUDPSocket extends AbstractUDPSocket{
 
     }
 
+    public void setTimeout(int n, TimeUnit unit) throws Exception {
+        switch (unit){
+            case SECONDS:
+                setTimeout(this.socketId, n, 0);
+                break;
+            case MICROSECONDS:
+                setTimeout(this.socketId, n, 1);
+                break;
+            default:
+                throw new Exception("Time may be only SECONDS or MICROSECONDS");
+        }
+    }
+
     private native int createSocketC();
     private native void sendToC(int sockId, byte[] buf, int len, int host, int port);
     private native void sendC(int sockId, byte[] buf, int len);
@@ -113,5 +127,6 @@ public class KernelUDPSocket extends AbstractUDPSocket{
     private native void joinMcastGroupC(int sockId, int mcastGroup, int _interface);
     private native void leaveMcastGroup(int sockId, int mcastGroup, int _interface);
     private native void setReuseAddrC(int sockId, int flag);
+    private native void setTimeout(int sockId, int n, int flag);
 
 }
