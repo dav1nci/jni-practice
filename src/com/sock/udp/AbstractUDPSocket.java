@@ -40,15 +40,13 @@ public abstract class AbstractUDPSocket {
     abstract public void close();
     abstract public void receive(UDPPacket packet) throws Exception;
     abstract public void setReuseAddress(boolean on);
-    abstract public void joinGroup(InetAddress mcastaddr);
-    abstract public void joinGroup(SocketAddress mcastaddr, NetworkInterface netIf) throws Exception;
-    abstract public void leaveGroup(InetAddress mcastaddr);
-    abstract public void leaveGroup(SocketAddress mcastaddr, NetworkInterface netIf);
+    abstract public void joinGroup(InetAddress mcastaddr, InetAddress interfaceAdr) throws Exception;
+    abstract public void leaveGroup(InetAddress mcastaddr, InetAddress interfaceAdr);
 
 
 
     public InetAddress getInetAddress() {
-        if (connected)
+        if (isConnected())
             return remoteAddress;
         return null;
     }
@@ -66,7 +64,7 @@ public abstract class AbstractUDPSocket {
     }
 
     public int getPort(){
-        if (connected)
+        if (isConnected())
             return remotePort;
         return -1;
     }

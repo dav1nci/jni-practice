@@ -77,4 +77,12 @@ public class UDPPacket {
     public void setMessage(byte[] buf) {
         this.buf = buf;
     }
+
+    public void setAddress(InetAddress address) {
+        this.address = address;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
 }

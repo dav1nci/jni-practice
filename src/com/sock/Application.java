@@ -6,6 +6,7 @@ import com.sock.udp.DBLUDPSocket;
 import com.sock.udp.UDPPacket;
 import com.sock.udp.KernelUDPSocket;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.concurrent.*;
 
@@ -14,6 +15,7 @@ public class Application {
     public static void main(String[] args) throws Exception {
         String server, client;
 		int port;
+        String mcasAddr = "224.5.5.5";
         if (args.length == 4){
             server = args[0];
             client= args[1];
@@ -37,6 +39,8 @@ public class Application {
                         e.printStackTrace();
                     }
                 break;
+            case "4":
+                testMulticastKernel(client, mcasAddr, port);
         }
     }
 
@@ -74,8 +78,9 @@ public class Application {
         UDPPacket response = new UDPPacket(new byte[bufLen], bufLen);
         s2.bind(new InetSocketAddress(server, port));
         //s2.connect(new InetSocketAddress("127.0.0.1", 50403));
+        s1.connect(new InetSocketAddress(server, port));
         s1.send(packet);
-        //s2.receive(response);
+        s2.receive(response);
         System.out.print("Java: ");
         for (byte i : response.getMessage())
             System.out.print((char)i);
@@ -107,5 +112,29 @@ public class Application {
         for (byte i : response.getMessage())
             System.out.print((char)i);
         System.out.println();
+    }
+
+    public static void testMulticastKernel(String clientAddr, String mcastAddr, int port) {
+        KernelUDPSocket client1 = new KernelUDPSocket();
+        KernelUDPSocket client2 = new KernelUDPSocket();
+        client1.setReuseAddress(true);
+        client2.setReuseAddress(true);
+        client1.bind(new InetSocketAddress(clientAddr, port));
+        client2.bind(new InetSocketAddress(clientAddr, port));
+        System.out.println("mcast is " + mcastAddr + "interface is " + clientAddr);
+        try {
+            client1.joinGroup(InetAddress.getByName(mcastAddr), InetAddress.getByName(clientAddr));
+            client2.joinGroup(InetAddress.getByName(mcastAddr), InetAddress.getByName(clientAddr));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        UDPPacket response1= new UDPPacket(new byte[50], 50);
+        UDPPacket response2 = new UDPPacket(new byte[50], 50);
+        client1.receive(response1);
+        client2.receive(response2);
+    }
+
+    public static void testMulticastDBL(){
+
     }
 }

@@ -17,11 +17,19 @@ JNIEXPORT jint JNICALL Java_com_sock_udp_KernelUDPSocket_createSocketC
 
 /*
  * Class:     com_sock_udp_KernelUDPSocket
- * Method:    sendC
+ * Method:    sendToC
  * Signature: (I[BIII)V
  */
-JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_sendC
+JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_sendToC
   (JNIEnv *, jobject, jint, jbyteArray, jint, jint, jint);
+
+/*
+ * Class:     com_sock_udp_KernelUDPSocket
+ * Method:    sendC
+ * Signature: (I[BI)V
+ */
+JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_sendC
+  (JNIEnv *, jobject, jint, jbyteArray, jint);
 
 /*
  * Class:     com_sock_udp_KernelUDPSocket
@@ -49,6 +57,14 @@ JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_receiveC
 
 /*
  * Class:     com_sock_udp_KernelUDPSocket
+ * Method:    receiveFromC
+ * Signature: (ILcom/sock/udp/UDPPacket;I)V
+ */
+JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_receiveFromC
+  (JNIEnv *, jobject, jint, jobject, jint);
+
+/*
+ * Class:     com_sock_udp_KernelUDPSocket
  * Method:    connectC
  * Signature: (III)V
  */
@@ -70,6 +86,22 @@ JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_disconnectC
  */
 JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_joinMcastGroupC
   (JNIEnv *, jobject, jint, jint, jint);
+
+/*
+ * Class:     com_sock_udp_KernelUDPSocket
+ * Method:    leaveMcastGroup
+ * Signature: (III)V
+ */
+JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_leaveMcastGroup
+  (JNIEnv *, jobject, jint, jint, jint);
+
+/*
+ * Class:     com_sock_udp_KernelUDPSocket
+ * Method:    setReuseAddrC
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_setReuseAddrC
+  (JNIEnv *, jobject, jint, jint);
 
 #ifdef __cplusplus
 }

@@ -12,11 +12,12 @@
 
 #ifdef _WIN32
 #pragma comment(lib, "ws2_32.lib")
+#endif
+
 typedef int bool;
 #define true 1
 #define false 0
 bool is_init = false;
-#endif
 
 JNIEXPORT jint JNICALL Java_com_sock_udp_KernelUDPSocket_createSocketC(JNIEnv *env, jobject obj){
     int s;
@@ -43,7 +44,7 @@ JNIEXPORT jint JNICALL Java_com_sock_udp_KernelUDPSocket_createSocketC(JNIEnv *e
     return s;
 }
 
-JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_sendC(
+JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_sendToC(
         JNIEnv *env, 
         jobject obj, 
         jint sock_id, 
@@ -53,8 +54,6 @@ JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_sendC(
         jint port){
     struct sockaddr_in receiver;
     memset((char *) &receiver, 0, sizeof(receiver));
-
-    //printf("C: try to send on host %d\n", (int)host);
 #ifdef _WIN32
     receiver.sin_addr.S_un.S_addr = (int)host;//inet_addr(c_host);
 #else
@@ -65,30 +64,45 @@ JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_sendC(
 
     //printf("C: Sending a message...\n");
     jboolean is_copy;
-    jint length = (*env) -> GetArrayLength(env, message);
     char *message_c = (*env) -> GetByteArrayElements(env, message, &is_copy);
-    if (sendto(sock_id, message_c, (int)length, 0, (struct sockaddr *) &receiver, sizeof(receiver)) == -1){
+    int result = sendto(sock_id, message_c, (int)mess_len, 0, (struct sockaddr *) &receiver, sizeof(receiver));
+    (*env) -> ReleaseByteArrayElements(env, message, message_c, JNI_ABORT);
+    if (result == -1) {
         char *className = "java/lang/Exception";
         jclass excClass = (*env) -> FindClass(env, className);
-        printf("C: Sending failed!\n");
+        printf("C: sendto() failed!\n");
         (*env) -> ThrowNew(env, excClass, "Sending Faied");
     }
-    (*env) -> ReleaseByteArrayElements(env, message, message_c, JNI_ABORT);
-    //printf("C: Message sended\n");
 }
 
+JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_sendC(JNIEnv *env, jobject obj, jint sockId, jbyteArray buf, jint bufLen){
+    jboolean is_copy;
+    char *buf_c = (*env) -> GetByteArrayElements(env, buf, &is_copy);
+    int result = send(sockId, buf_c, bufLen, 0);
+    (*env) -> ReleaseByteArrayElements(env, buf, buf_c, JNI_ABORT);
+    if (result == -1){
+        char *className = "java/lang/Exception";
+        jclass excClass = (*env) -> FindClass(env, className);
+        printf("C: send() failed!\n");
+        (*env) -> ThrowNew(env, excClass, "Sending Faied");
+    }
+}
 
 JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_bindC(JNIEnv *env, jobject obj, jint sockId, jint host, jint port){
     struct sockaddr_in sin;
     memset(&sin, 0, sizeof(sin));
     sin.sin_family = AF_INET;
+#ifdef _WIN32
+    sin.sin_addr.S_un.S_addr = (int)host;
+#else
     sin.sin_addr.s_addr = (int)host;
+#endif
     sin.sin_port = htons((int)port);
 
     if (bind((int)sockId, (struct sockaddr *) &sin, sizeof(sin)) < 0){
         char *className = "java/lang/Exception";
         jclass excClass = (*env) -> FindClass(env, className);
-        //printf("C: Bind failed\n");
+        printf("C: Bind failed\n");
         (*env) -> ThrowNew(env, excClass, "Bind failed");
     }
 }
@@ -102,8 +116,29 @@ JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_closeC(JNIEnv *env, job
 #endif
 }
 
-JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_receiveC(JNIEnv *env, jobject obj, jint sockId, jobject packet, jint buflen){
+JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_receiveC(JNIEnv *env, jobject obj, jint sockId, jobject packet, jint bufLen){
+   char buf[bufLen];
+   memset(buf, '\0', sizeof(buf));
+   int result = recv(sockId, buf, bufLen, 0);
+   if (result == -1){
+        char *className = "java/lang/Exception";
+        jclass excClass = (*env) -> FindClass(env, className);
+        printf("C: recv() failed\n");
+        (*env) -> ThrowNew(env, excClass, "recv() failed");
+    }
+    
+    jclass udp_packet_class = (*env) -> GetObjectClass(env, packet);
+    jfieldID fidBuf =     (*env) -> GetFieldID(env, udp_packet_class, "buf", "[B");
 
+    // Creating java byte array and copy receiving message to them
+    jbyteArray message = (*env) -> NewByteArray(env, bufLen);
+    (*env) -> SetByteArrayRegion(env, message, 0, bufLen, buf);
+
+    // Setting packet buf field
+    (*env) -> SetObjectField(env, packet, fidBuf, message);
+}
+
+JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_receiveFromC(JNIEnv *env, jobject obj, jint sockId, jobject packet, jint buflen){
     int recv_len;
     char buf[(int)buflen];
     memset(buf, '\0', (int)buflen);
@@ -115,7 +150,6 @@ JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_receiveC(JNIEnv *env, j
         printf("C: Cannot receive message\n");
         (*env) -> ThrowNew(env, excClass, "Cannot receive message");
     }
-
     jclass udp_packet_class = (*env) -> GetObjectClass(env, packet);
 
     jfieldID fidAddress = (*env) -> GetFieldID(env, udp_packet_class, "address", "Ljava/net/InetAddress;");
@@ -144,7 +178,11 @@ JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_receiveC(JNIEnv *env, j
 JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_connectC(JNIEnv *env, jobject obj, jint sockId, jint host, jint port){
     struct sockaddr_in conn_sock;
     conn_sock.sin_family = AF_INET;
+#ifdef _WIN32
+    conn_sock.sin_addr.S_un.S_addr = (int)host;
+#else
     conn_sock.sin_addr.s_addr = (int)host;
+#endif
     conn_sock.sin_port = htons((int)port);
 
     if (connect((int)sockId, (struct sockaddr *) &conn_sock, sizeof(conn_sock)) < 0){
@@ -161,4 +199,31 @@ JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_disconnectC(JNIEnv *env
 #else
     shutdown(sockId, SHUT_RDWR);
 #endif
+}
+
+JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_joinMcastGroupC(JNIEnv *env, jobject obj, jint sockId, jint mcastIp, jint interfaceIp){
+    struct ip_mreq group;
+    group.imr_multiaddr.s_addr = mcastIp;
+    group.imr_interface.s_addr = interfaceIp;
+    if (setsockopt(sockId, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char *) &group, sizeof(group)) < 0){
+        char *className = "java/lang/Exception";
+        jclass excClass = (*env) -> FindClass(env, className);
+        printf("C: adding socket to mcast group faied\n");
+        (*env) -> ThrowNew(env, excClass, "Adding socket to mcast group faied");
+    }
+
+}
+
+JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_leaveMcastGroup(JNIEnv *env, jobject obj, jint sockId, jint mcastIp, jint interfaceIp){
+
+}
+
+JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_setReuseAddrC(JNIEnv *env, jobject obj, jint sockId, jint flag){
+    int reuse = flag;
+    if (setsockopt(sockId, SOL_SOCKET, SO_REUSEADDR, (char *) &reuse, sizeof(reuse)) < 0){
+        char *className = "java/lang/Exception";
+        jclass excClass = (*env) -> FindClass(env, className);
+        printf("C: SET SO_REUSEADDR failed\n");
+        (*env) -> ThrowNew(env, excClass, "Set SO_REUSEADDR failed");
+    }
 }

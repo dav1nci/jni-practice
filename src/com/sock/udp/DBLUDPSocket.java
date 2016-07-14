@@ -123,23 +123,13 @@ public class DBLUDPSocket extends AbstractUDPSocket {
     }
 
     @Override
-    public void joinGroup(InetAddress mcastaddr) {
+    public void joinGroup(InetAddress mcastaddr, InetAddress interfaceAddr) {
         mcastJoinC(this.channelId, hostToInt(mcastaddr));
     }
 
     @Override
-    public void joinGroup(SocketAddress mcastaddr, NetworkInterface netIf) {
-
-    }
-
-    @Override
-    public void leaveGroup(InetAddress mcastaddr) {
+    public void leaveGroup(InetAddress mcastaddr, InetAddress interfaceAddr) {
         mcastLeaveC(this.channelId, hostToInt(mcastaddr));
-    }
-
-    @Override
-    public void leaveGroup(SocketAddress mcastaddr, NetworkInterface netIf) {
-
     }
 
     @Override
