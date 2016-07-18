@@ -87,6 +87,7 @@ public class DBLUDPSocket extends AbstractUDPSocket {
     }
 
     public void bindAddr(SocketAddress addr) {
+		System.out.println("Java: bindAddr() called");
         this.channelId = bindAddrC(this.deviceId, hostToInt(addr), this.bindFlag, ((InetSocketAddress)addr).getPort());
         this.port = ((InetSocketAddress) addr).getPort();
         this.bound = true;

@@ -48,7 +48,8 @@ clean-win:
 	del UDP.jar
 
 jar:
-	echo Main-Class: com.sock.Application > bin/MANIFEST.MF
+	echo Class-Path: UDP.jar >> bin/MANIFEST.MF
+	echo Main-Class: com.sock.Application >> bin/MANIFEST.MF
 	jar cvfm UDP.jar bin/MANIFEST.MF -C bin/ . lib/
 
 run:

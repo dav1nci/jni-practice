@@ -6,6 +6,7 @@
 #include <assert.h>
 #ifdef _WIN32
 #include <winsock2.h>
+#include <ws2tcpip.h>
 #else
 #include <arpa/inet.h>
 #endif
@@ -171,22 +172,28 @@ JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_receiveFromC(JNIEnv *env, 
     printf("C: After dbl_recvfrom() from dev = %d\n", (int)devId);
     jclass udp_packet_class = (*env) -> GetObjectClass(env, packet);
 
-    jfieldID fidAddress = (*env) -> GetFieldID(env, udp_packet_class, "address", "Ljava/net/InetAddress;");
-    jfieldID fidBuf =     (*env) -> GetFieldID(env, udp_packet_class, "buf", "[B");
-    jfieldID fidPort =    (*env) -> GetFieldID(env, udp_packet_class, "port", "I");
-
+    jfieldID fidAddress_from = (*env) -> GetFieldID(env, udp_packet_class, "address", "Ljava/net/InetAddress;");
+    jfieldID fidBuf          = (*env) -> GetFieldID(env, udp_packet_class, "buf", "[B");
+    jfieldID fidPort_from    = (*env) -> GetFieldID(env, udp_packet_class, "port", "I");
+	
+	jfieldID fidAddress_to = (*env) -> GetFieldID(env, udp_packet_class, "toAddr", "Ljava/net/InetAddress;");
+    jfieldID fidPort_to    = (*env) -> GetFieldID(env, udp_packet_class, "toPort", "I");
 
     jclass inet_address_class = (*env) -> FindClass(env, "java/net/InetAddress");
-
     jmethodID inet_addr_getByName = (*env) -> GetStaticMethodID(env, inet_address_class, "getByName", "(Ljava/lang/String;)Ljava/net/InetAddress;");
-    jstring host = (*env) -> NewStringUTF(env, inet_ntoa(rxinfo.sin_from.sin_addr));
-    jobject inet_address = (*env) -> CallStaticObjectMethod(env, inet_address_class, inet_addr_getByName, host);
+	
+    jstring host_from = (*env) -> NewStringUTF(env, inet_ntoa(rxinfo.sin_from.sin_addr));
+	jstring host_to   = (*env) -> NewStringUTF(env, inet_ntoa(rxinfo.sin_to.sin_addr));
+    jobject inet_address_from = (*env) -> CallStaticObjectMethod(env, inet_address_class, inet_addr_getByName, host_from);
+	jobject inet_address_to   = (*env) -> CallStaticObjectMethod(env, inet_address_class, inet_addr_getByName, host_to  );
 
     jbyteArray message = (*env) -> NewByteArray(env, (int)bufLen);
-    (*env) -> SetByteArrayRegion(env, message, 0, (int)bufLen, buf);
-    (*env) -> SetObjectField(    env, packet,  fidAddress,     inet_address);
-    (*env) -> SetObjectField(    env, packet,  fidBuf,         message);
-    (*env) -> SetIntField(       env, packet,  fidPort,        ntohs(rxinfo.sin_from.sin_port));
+    (*env) -> SetByteArrayRegion(env, message, 0, (int)bufLen,  buf);
+    (*env) -> SetObjectField(    env, packet,  fidAddress_from, inet_address_from);
+	(*env) -> SetObjectField(    env, packet,  fidAddress_to,   inet_address_to);
+    (*env) -> SetObjectField(    env, packet,  fidBuf,          message);
+    (*env) -> SetIntField(       env, packet,  fidPort_from,    ntohs(rxinfo.sin_from.sin_port));
+	(*env) -> SetIntField(       env, packet,  fidPort_to,      ntohs(rxinfo.sin_to.sin_port));
 }
 
 JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_mcastJoinC(JNIEnv *env, jobject obj, jint channId, jint ipAddr){
@@ -246,7 +253,7 @@ JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_deviceEnableC(JNIEnv *env,
 
 JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_shutdownC(JNIEnv *env, jobject obj, jint devId){
     printf("C: Try to dbl_shutdown()\n");
-    DBL_Safe(dbl_shutdown((*devices[devId]), 0));
+    //DBL_Safe(dbl_shutdown((*devices[devId]), 0));
 }
 
 JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_unbindC(JNIEnv *env, jobject obj, jint channId){

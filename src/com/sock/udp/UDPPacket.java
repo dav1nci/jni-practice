@@ -13,6 +13,9 @@ public class UDPPacket {
     private int port;
     private byte[] buf;
     private int bufLen;
+	
+	private InetAddress toAddr;
+	private int toPort;
 
     /**
      * Constructs a datagram packet for sending packets of length
@@ -85,4 +88,12 @@ public class UDPPacket {
     public void setPort(int port) {
         this.port = port;
     }
+	
+	public int getToAddr() {
+        return ByteBuffer.wrap(this.toAddr.getAddress()).order(ByteOrder.LITTLE_ENDIAN).getInt();
+    }
+	
+	public int getToPort() {
+		return toPort;
+	}
 }

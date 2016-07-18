@@ -4,6 +4,7 @@
 #include "com_sock_udp_KernelUDPSocket.h"
 #ifdef _WIN32
 #include <winsock2.h>
+#include <ws2tcpip.h>
 #else
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -98,7 +99,8 @@ JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_bindC(JNIEnv *env, jobj
     sin.sin_addr.s_addr = (int)host;
 #endif
     sin.sin_port = htons((int)port);
-
+	
+	printf("Try to bind() socket to port %d\n", port);
     if (bind((int)sockId, (struct sockaddr *) &sin, sizeof(sin)) < 0){
         char *className = "java/lang/Exception";
         jclass excClass = (*env) -> FindClass(env, className);
@@ -201,10 +203,10 @@ JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_disconnectC(JNIEnv *env
 #endif
 }
 
-JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_joinMcastGroupC(JNIEnv *env, jobject obj, jint sockId, jint mcastIp, jint interfaceIp){
+JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_joinMcastGroupC(JNIEnv *env, jobject obj, jint sockId, jint mcastIp, jint interfaceIp){	
     struct ip_mreq group;
     group.imr_multiaddr.s_addr = mcastIp;
-    group.imr_interface.s_addr = interfaceIp;
+    group.imr_interface.s_addr = htonl(INADDR_ANY);
     if (setsockopt(sockId, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char *) &group, sizeof(group)) < 0){
         char *className = "java/lang/Exception";
         jclass excClass = (*env) -> FindClass(env, className);
@@ -228,6 +230,7 @@ JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_leaveMcastGroup(JNIEnv 
 
 JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_setReuseAddrC(JNIEnv *env, jobject obj, jint sockId, jint flag){
     int reuse = flag;
+	printf("C: setting SO_REUSEADDR option\n");
     if (setsockopt(sockId, SOL_SOCKET, SO_REUSEADDR, (char *) &reuse, sizeof(reuse)) < 0){
         char *className = "java/lang/Exception";
         jclass excClass = (*env) -> FindClass(env, className);
@@ -245,6 +248,7 @@ JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_setTimeout(JNIEnv *env,
         tv.tv_sec = 0;
         tv.tv_usec = n;
     }
+	
     if (setsockopt(sockId, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0){
         char *className = "java/lang/Exception";
         jclass excClass = (*env) -> FindClass(env, className);

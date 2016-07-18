@@ -5,6 +5,7 @@ import com.sock.test.ServerSocket;
 import com.sock.udp.DBLUDPSocket;
 import com.sock.udp.UDPPacket;
 import com.sock.udp.KernelUDPSocket;
+import com.sock.udp.DeviceAttributes;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -90,10 +91,20 @@ public class Application {
     public static void testDBLSocket(String serverAddr, String clientAddr, int port) throws Exception {
         System.out.println("Test DBL socket");
 		DBLUDPSocket server = new DBLUDPSocket(new InetSocketAddress(serverAddr, 0), DBLUDPSocket.DBL_OPEN_THREADSAFE); // 0 in port parameter ignored
+		DBLUDPSocket server2 = new DBLUDPSocket(new InetSocketAddress(serverAddr, 0), DBLUDPSocket.DBL_OPEN_THREADSAFE); // 0 in port parameter ignored
+		
+		DeviceAttributes attrs = new DeviceAttributes();
+		server.deviceGetAttributes(attrs);
+		System.out.println("filter = " + attrs.getRecvqFilterMode() 
+		+ " resvqSize = " + attrs.getRecvqSize() 
+		+ " hwTimestamping = " + attrs.getHwTimestamping());
+		
         //DBLUDPSocket client = new DBLUDPSocket(new InetSocketAddress(clientAddr, 0), DBLUDPSocket.DBL_OPEN_THREADSAFE);
         try {
             server.setBindFlag(DBLUDPSocket.DBL_BIND_REUSEADDR);
-            server.bind(new InetSocketAddress(port));
+            server.bindAddr(new InetSocketAddress(serverAddr, port));
+			server2.setBindFlag(DBLUDPSocket.DBL_BIND_REUSEADDR);
+            server2.bindAddr(new InetSocketAddress(serverAddr, port + 1));
             //client.bind(new InetSocketAddress(port));
         } catch (Exception e) {
             e.printStackTrace();
@@ -106,32 +117,35 @@ public class Application {
 		//client.connect(new InetSocketAddress(serverAddr, port));
 		//System.out.println("Java: try to client.send()");
         //client.send(packet);
-		server.setRecvMode(DBLUDPSocket.DBL_RECV_DEFAULT);
-        server.receive(response);
+		server2.setRecvMode(DBLUDPSocket.DBL_RECV_DEFAULT);
+        server2.receive(response);
         System.out.print("Java: ");
         for (byte i : response.getMessage())
             System.out.print((char)i);
         System.out.println();
+		System.out.println("Message comes from " + response.getHost() + ":" + response.getPort());
+		System.out.println("Message comes to " + response.getToAddr() + ":" + response.getToPort());
+		
     }
 
     public static void testMulticastKernel(String clientAddr, String mcastAddr, int port) {
         KernelUDPSocket client1 = new KernelUDPSocket();
-        KernelUDPSocket client2 = new KernelUDPSocket();
+        //KernelUDPSocket client2 = new KernelUDPSocket();
         client1.setReuseAddress(true);
-        client2.setReuseAddress(true);
+        //client2.setReuseAddress(true);
         client1.bind(new InetSocketAddress(clientAddr, port));
-        client2.bind(new InetSocketAddress(clientAddr, port));
+        //client2.bind(new InetSocketAddress(clientAddr, port));
         System.out.println("mcast is " + mcastAddr + "interface is " + clientAddr);
         try {
             client1.joinGroup(InetAddress.getByName(mcastAddr), InetAddress.getByName(clientAddr));
-            client2.joinGroup(InetAddress.getByName(mcastAddr), InetAddress.getByName(clientAddr));
+            //client2.joinGroup(InetAddress.getByName(mcastAddr), InetAddress.getByName(clientAddr));
         } catch (Exception e) {
             e.printStackTrace();
         }
         UDPPacket response1= new UDPPacket(new byte[50], 50);
-        UDPPacket response2 = new UDPPacket(new byte[50], 50);
+        //UDPPacket response2 = new UDPPacket(new byte[50], 50);
         client1.receive(response1);
-        client2.receive(response2);
+        //client2.receive(response2);
     }
 
     public static void testMulticastDBL(){
