@@ -89,12 +89,12 @@ public class Application {
 
     public static void testDBLSocket(String serverAddr, String clientAddr, int port) throws Exception {
         System.out.println("Test DBL socket");
-		//DBLUDPSocket server = new DBLUDPSocket(new InetSocketAddress(serverAddr, 0), DBLUDPSocket.DBL_OPEN_THREADSAFE); // 0 in port parameter ignored
-        DBLUDPSocket client = new DBLUDPSocket(new InetSocketAddress(clientAddr, 0), DBLUDPSocket.DBL_OPEN_THREADSAFE);
+		DBLUDPSocket server = new DBLUDPSocket(new InetSocketAddress(serverAddr, 0), DBLUDPSocket.DBL_OPEN_THREADSAFE); // 0 in port parameter ignored
+        //DBLUDPSocket client = new DBLUDPSocket(new InetSocketAddress(clientAddr, 0), DBLUDPSocket.DBL_OPEN_THREADSAFE);
         try {
-            //server.setBindFlag(DBLUDPSocket.DBL_BIND_REUSEADDR);
-            //server.bind(new InetSocketAddress(port));
-            client.bind(new InetSocketAddress(port));
+            server.setBindFlag(DBLUDPSocket.DBL_BIND_REUSEADDR);
+            server.bind(new InetSocketAddress(port));
+            //client.bind(new InetSocketAddress(port));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -104,10 +104,10 @@ public class Application {
         UDPPacket response = new UDPPacket(new byte[bufLen], bufLen);
 		System.out.println("Java: try to client.connect()");
 		//client.connect(new InetSocketAddress(serverAddr, port));
-		System.out.println("Java: try to client.send()");
-        client.send(packet);
-		//server.setRecvMode(DBLUDPSocket.DBL_RECV_DEFAULT);
-        //server.receive(response);
+		//System.out.println("Java: try to client.send()");
+        //client.send(packet);
+		server.setRecvMode(DBLUDPSocket.DBL_RECV_DEFAULT);
+        server.receive(response);
         System.out.print("Java: ");
         for (byte i : response.getMessage())
             System.out.print((char)i);
