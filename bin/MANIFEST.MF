@@ -1,0 +1,2 @@
+Class-Path: UDP.jar 
+Main-Class: com.sock.Application 

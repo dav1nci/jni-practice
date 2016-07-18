@@ -8,7 +8,17 @@ public class DeviceAttributes {
     private int recvqSize;
     private int hwTimestamping;
     private int reserved_1;
-
+	
+	public DeviceAttributes() {
+		
+	}
+	
+	public DeviceAttributes(int recvqFilterMode, int recvqSize, int hwTimestamping) {
+		this.recvqFilterMode = recvqFilterMode;
+		this.recvqSize = recvqSize;
+		this.hwTimestamping = hwTimestamping;
+	}
+	
     public int getRecvqFilterMode() {
         return recvqFilterMode;
     }

@@ -1,0 +1,8 @@
+C:\Users\Dima\Documents\jni-practice\src\com\sock\Application.java
+C:\Users\Dima\Documents\jni-practice\src\com\sock\test\ClientSocket.java
+C:\Users\Dima\Documents\jni-practice\src\com\sock\test\ServerSocket.java
+C:\Users\Dima\Documents\jni-practice\src\com\sock\udp\AbstractUDPSocket.java
+C:\Users\Dima\Documents\jni-practice\src\com\sock\udp\DBLUDPSocket.java
+C:\Users\Dima\Documents\jni-practice\src\com\sock\udp\DeviceAttributes.java
+C:\Users\Dima\Documents\jni-practice\src\com\sock\udp\KernelUDPSocket.java
+C:\Users\Dima\Documents\jni-practice\src\com\sock\udp\UDPPacket.java
