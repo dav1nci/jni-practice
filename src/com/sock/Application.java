@@ -155,10 +155,14 @@ public class Application {
         System.out.println();
 		System.out.println("Message comes from " + response.getHost() + ":" + response.getPort());
 		System.out.println("Message comes to " + response.getToAddr() + ":" + response.getToPort());
+		
+		UDPPacket packet = new UDPPacket(message.getBytes(), message.length(), new InetSocketAddress(clientAddr, port));
+		server.send(packet);
 	}
 	
 	public static void startDblClient(String serverAddr, String clientAddr, int port) throws Exception {
 		DBLUDPSocket client = new DBLUDPSocket(new InetSocketAddress(clientAddr, 0), DBLUDPSocket.DBL_OPEN_THREADSAFE);
+		DBLUDPSocket client2 = new DBLUDPSocket(new InetSocketAddress(clientAddr, 0), DBLUDPSocket.DBL_OPEN_THREADSAFE);
 		DeviceAttributes attrs = new DeviceAttributes();
 		client.deviceGetAttributes(attrs);
 		System.out.println("filter = " + attrs.getRecvqFilterMode() 
@@ -166,9 +170,12 @@ public class Application {
 		+ " hwTimestamping = " + attrs.getHwTimestamping());        
         try {
             client.bind(new InetSocketAddress(port));
+			client2.bind(new InetSocketAddress(port + 1));
         } catch (Exception e) {
             e.printStackTrace();
         }
+		
+		//sending part
         String message = "Hello me name is Dima!";
         int bufLen = message.length();
         UDPPacket packet = new UDPPacket(message.getBytes(), message.length(), new InetSocketAddress(serverAddr, port));
@@ -177,6 +184,15 @@ public class Application {
 		System.out.println("Java: try to client.send()");
         client.send(packet);
 		System.out.println("Java: message sended.");
+		
+		//receiving part
+		client.setRecvMode(DBLUDPSocket.DBL_RECV_DEFAULT);
+		UDPPacket response = new UDPPacket(new byte[100], 100);
+		client.receive(response);
+		System.out.print("Java: Responce is ");
+        for (byte i : response.getMessage())
+            System.out.print((char)i);
+		System.out.println();
 	}
 
     public static void testMulticastKernel(String clientAddr, String mcastAddr, int port) {
