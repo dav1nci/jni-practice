@@ -147,17 +147,22 @@ public class Application {
 		
         String message = "Hello me name is Dima!";
         UDPPacket response = new UDPPacket(new byte[100], 100);
-		server.setRecvMode(DBLUDPSocket.DBL_RECV_DEFAULT);
-        server.receive(response);
-        System.out.print("Java: ");
-        for (byte i : response.getMessage())
-            System.out.print((char)i);
-        System.out.println();
-		System.out.println("Message comes from " + response.getHost() + ":" + response.getPort());
-		System.out.println("Message comes to " + response.getToAddr() + ":" + response.getToPort());
 		
-		UDPPacket packet = new UDPPacket(message.getBytes(), message.length(), new InetSocketAddress(clientAddr, port));
-		server.send(packet);
+		server.setRecvMode(DBLUDPSocket.DBL_RECV_DEFAULT);
+		
+		for (int i = 0; i < 100; ++i){
+			System.out.println("Another server iteration");
+			server.receive(response);
+			System.out.print("Java: received message: ");
+			for (byte i : response.getMessage())
+				System.out.print((char)i);
+			System.out.println();
+			System.out.println("Java: Message comes from " + response.getHost() + ":" + response.getPort());
+			System.out.println("Java: Message comes to " + response.getToAddr() + ":" + response.getToPort());
+			UDPPacket packet = new UDPPacket(message.getBytes(), message.length(), new InetSocketAddress(clientAddr, port));
+			server.send(packet);
+		}
+		
 	}
 	
 	public static void startDblClient(String serverAddr, String clientAddr, int port) throws Exception {
