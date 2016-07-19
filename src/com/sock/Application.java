@@ -17,21 +17,21 @@ public class Application {
         String server, client;
 		int port;
         String mcasAddr = "224.5.5.5";
-        if (args.length == 4){
-            server = args[0];
-            client= args[1];
-			port = Integer.parseInt(args[2]);
-        } else {
-            System.out.println("You forgot to enter local and remote ip addresses! and port");
-            return;
-        }
+		server = args[0];
+		client= args[1];
+		port = Integer.parseInt(args[2]);
 
         switch (args[3]){
             case "1":
                 testSocket(server, client, port);
                 break;
             case "2":
-                testDBLSocket(server, client, port);
+				String serverOrClient = args[4];
+				if (serverOrClient.equals("server")) {
+					startDblServer(server, client, port);
+				} else if (serverOrClient.equals("client")) {
+					startDblClient(server, client, port);
+				}
                 break;
             case "3":
                 try {
@@ -42,6 +42,7 @@ public class Application {
                 break;
             case "4":
                 testMulticastKernel(client, mcasAddr, port);
+				break;
         }
     }
 
@@ -127,6 +128,56 @@ public class Application {
 		System.out.println("Message comes to " + response.getToAddr() + ":" + response.getToPort());
 		
     }
+	
+	public static void startDblServer(String serverAddr, String clientAddr, int port) throws Exception {
+		DBLUDPSocket server = new DBLUDPSocket(new InetSocketAddress(serverAddr, 0), DBLUDPSocket.DBL_OPEN_THREADSAFE); // 0 in port parameter ignored
+		
+		DeviceAttributes attrs = new DeviceAttributes();
+		server.deviceGetAttributes(attrs);
+		System.out.println("filter = " + attrs.getRecvqFilterMode() 
+		+ " resvqSize = " + attrs.getRecvqSize() 
+		+ " hwTimestamping = " + attrs.getHwTimestamping());
+		
+        try {
+            server.setBindFlag(DBLUDPSocket.DBL_BIND_REUSEADDR);
+            server.bindAddr(new InetSocketAddress(serverAddr, port));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+		
+        String message = "Hello me name is Dima!";
+        UDPPacket response = new UDPPacket(new byte[100], 100);
+		server.setRecvMode(DBLUDPSocket.DBL_RECV_DEFAULT);
+        server.receive(response);
+        System.out.print("Java: ");
+        for (byte i : response.getMessage())
+            System.out.print((char)i);
+        System.out.println();
+		System.out.println("Message comes from " + response.getHost() + ":" + response.getPort());
+		System.out.println("Message comes to " + response.getToAddr() + ":" + response.getToPort());
+	}
+	
+	public static void startDblClient(String serverAddr, String clientAddr, int port) throws Exception {
+		DBLUDPSocket client = new DBLUDPSocket(new InetSocketAddress(clientAddr, 0), DBLUDPSocket.DBL_OPEN_THREADSAFE);
+		DeviceAttributes attrs = new DeviceAttributes();
+		client.deviceGetAttributes(attrs);
+		System.out.println("filter = " + attrs.getRecvqFilterMode() 
+		+ " resvqSize = " + attrs.getRecvqSize() 
+		+ " hwTimestamping = " + attrs.getHwTimestamping());        
+        try {
+            client.bind(new InetSocketAddress(port));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        String message = "Hello me name is Dima!";
+        int bufLen = message.length();
+        UDPPacket packet = new UDPPacket(message.getBytes(), message.length(), new InetSocketAddress(serverAddr, port));
+		System.out.println("Java: try to client.connect()");
+		client.connect(new InetSocketAddress(serverAddr, port));
+		System.out.println("Java: try to client.send()");
+        client.send(packet);
+		System.out.println("Java: message sended.");
+	}
 
     public static void testMulticastKernel(String clientAddr, String mcastAddr, int port) {
         KernelUDPSocket client1 = new KernelUDPSocket();

@@ -1,4 +1,6 @@
 C:\Users\Dima\Documents\jni-practice\src\com\sock\Application.java
+C:\Users\Dima\Documents\jni-practice\src\com\sock\tcp\DBLTCPSocket.java
+C:\Users\Dima\Documents\jni-practice\src\com\sock\tcp\KernelTCPSocket.java
 C:\Users\Dima\Documents\jni-practice\src\com\sock\test\ClientSocket.java
 C:\Users\Dima\Documents\jni-practice\src\com\sock\test\ServerSocket.java
 C:\Users\Dima\Documents\jni-practice\src\com\sock\udp\AbstractUDPSocket.java
