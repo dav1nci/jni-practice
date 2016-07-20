@@ -154,25 +154,19 @@ JNIEXPORT void JNICALL Java_com_sock_udp_KernelUDPSocket_receiveFromC(JNIEnv *en
     }
     jclass udp_packet_class = (*env) -> GetObjectClass(env, packet);
 
-    jfieldID fidAddress = (*env) -> GetFieldID(env, udp_packet_class, "address", "Ljava/net/InetAddress;");
-    jfieldID fidBuf =     (*env) -> GetFieldID(env, udp_packet_class, "buf", "[B");
-    jfieldID fidPort =    (*env) -> GetFieldID(env, udp_packet_class, "port", "I");
-
-    ////Getting InetAddress object
-
-    jclass inet_address_class = (*env) -> FindClass(env, "java/net/InetAddress");
-
-    jmethodID inet_addr_getByName = (*env) -> GetStaticMethodID(env, inet_address_class, "getByName", "(Ljava/lang/String;)Ljava/net/InetAddress;");
-    jstring host = (*env) -> NewStringUTF(env, inet_ntoa(other.sin_addr));
-    jobject inet_address = (*env) -> CallStaticObjectMethod(env, inet_address_class, inet_addr_getByName, host);
-
-    (*env) -> ReleaseStringUTFChars(env, host, NULL);
+    jfieldID fidAddress = (*env) -> GetFieldID(env, udp_packet_class, "address", "I");
+    jfieldID fidBuf =     (*env) -> GetFieldID(env, udp_packet_class, "buf",     "[B");
+    jfieldID fidPort =    (*env) -> GetFieldID(env, udp_packet_class, "port",    "I");
 
     jbyteArray message = (*env) -> NewByteArray(env, (int)buflen);
     (*env) -> SetByteArrayRegion(env, message, 0, (int)buflen, buf);
-    (*env) -> SetObjectField(    env, packet,  fidAddress,     inet_address);
-    (*env) -> SetObjectField(    env, packet,  fidBuf,         message);
-    (*env) -> SetIntField(       env, packet,  fidPort,        ntohs(other.sin_port));
+#ifdef _WIN32
+    (*env) -> SetIntField(    env, packet,  fidAddress, other.sin_addr.S_un.S_addr);
+#else
+    (*env) -> SetIntField(    env, packet,  fidAddress, other.sin_addr.s_addr     );
+#endif
+    (*env) -> SetObjectField(    env, packet,  fidBuf,  message                   );
+    (*env) -> SetIntField(       env, packet,  fidPort, ntohs(other.sin_port)     );
 
     //printf("Received packet from %s:%d\n", inet_ntoa(other.sin_addr), ntohs(other.sin_port));
 }

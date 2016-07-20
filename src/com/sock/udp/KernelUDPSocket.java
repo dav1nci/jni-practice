@@ -1,8 +1,5 @@
 package com.sock.udp;
 
-import java.net.*;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -20,10 +17,10 @@ public class KernelUDPSocket extends AbstractUDPSocket{
         this.closed = false;
     }
 
-    public KernelUDPSocket(int port){
+    public KernelUDPSocket(int port) throws Exception {
         this.socketId = createSocketC();
         this.closed = false;
-        this.bind(new InetSocketAddress("127.0.0.1", port));
+        this.bind(hostToInt("127.0.0.1"), port);
         this.bound = true;
     }
 
@@ -36,29 +33,17 @@ public class KernelUDPSocket extends AbstractUDPSocket{
     }
 
     @Override
-    public void bind(SocketAddress addr){
-        bindC(
-                this.socketId,
-                hostToInt(addr),
-                ((InetSocketAddress) addr).getPort()
-        );
+    public void bind(int address, int port){
+        bindC(this.socketId, address, port);
         this.bound = true;
     }
 
     @Override
-    public void connect(SocketAddress addr){
-        connectC(this.socketId, hostToInt(addr), ((InetSocketAddress) addr).getPort());
-        this.remoteAddress = ((InetSocketAddress) addr).getAddress();
-        this.remotePort = ((InetSocketAddress) addr).getPort();
-        this.connected = true;
-    }
-
-    @Override
-    public void connect(InetAddress address, int port){
+    public void connect(int address, int port){
         this.remoteAddress = address;
         this.remotePort = port;
         this.connected = true;
-        connectC(this.socketId, hostToInt(address), port);
+        connectC(this.socketId, address, port);
     }
 
     @Override
@@ -73,12 +58,12 @@ public class KernelUDPSocket extends AbstractUDPSocket{
     }
 
     @Override
-    public void receive(UDPPacket packet){
+    public void receive(UDPPacket packet) throws Exception {
         if (isConnected())
             receiveC(socketId, packet, packet.getBufLen());
         else {
             receiveFromC(this.socketId, packet, packet.getBufLen());
-            packet.setAddress(this.getInetAddress());
+            packet.setAddress(this.getRemoteAddress());
             packet.setPort(this.getPort());
         }
     }
@@ -90,15 +75,15 @@ public class KernelUDPSocket extends AbstractUDPSocket{
     }
 
     @Override
-    public void joinGroup(InetAddress mcastaddr, InetAddress interfaceAddr) throws Exception {
+    public void joinGroup(int mcastaddr, int interfaceAddr) throws Exception {
         if (!this.isBound())
             throw new Exception("Socket not bound to a port");
         else
-            joinMcastGroupC(this.socketId, hostToInt(mcastaddr), hostToInt(interfaceAddr));
+            joinMcastGroupC(this.socketId, mcastaddr, interfaceAddr);
     }
 
     @Override
-    public void leaveGroup(InetAddress mcastaddr, InetAddress interfaceAddr) {
+    public void leaveGroup(int mcastaddr, int interfaceAddr) {
 
     }
 

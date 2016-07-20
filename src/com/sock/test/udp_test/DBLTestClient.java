@@ -1,5 +1,6 @@
-package com.sock.test;
+package com.sock.test.udp_test;
 
+import com.sock.udp.AbstractUDPSocket;
 import com.sock.udp.DBLUDPSocket;
 import com.sock.udp.UDPPacket;
 
@@ -26,20 +27,20 @@ public class DBLTestClient implements Callable<String> {
 
     @Override
     public String call() throws Exception {
-        DBLUDPSocket client = new DBLUDPSocket(new InetSocketAddress(clientAddr, 0), DBLUDPSocket.DBL_OPEN_THREADSAFE);
+        DBLUDPSocket client = new DBLUDPSocket(clientAddr, DBLUDPSocket.DBL_OPEN_THREADSAFE);
         try {
-            client.bind(new InetSocketAddress(port));
+            client.bind(0, port);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         //sending part
         int bufLen = message.length();
-        UDPPacket packet = new UDPPacket(message.getBytes(), message.length(), new InetSocketAddress(serverAddr, port));
+        UDPPacket packet = new UDPPacket(message.getBytes(), message.length(), AbstractUDPSocket.hostToInt(this.serverAddr), 8888);
         UDPPacket response = new UDPPacket(new byte[100], 100);
 
         System.out.println("Java: try to client.connect()");
-        client.connect(new InetSocketAddress(serverAddr, port));
+        client.connect(AbstractUDPSocket.hostToInt(this.serverAddr), this.port);
         client.setRecvMode(DBLUDPSocket.DBL_RECV_DEFAULT);
 
         for (int i = 0; i < 30; ++i) {

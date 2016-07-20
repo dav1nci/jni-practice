@@ -1,5 +1,6 @@
-package com.sock.test;
+package com.sock.test.udp_test;
 
+import com.sock.udp.AbstractUDPSocket;
 import com.sock.udp.KernelUDPSocket;
 import com.sock.udp.UDPPacket;
 
@@ -34,9 +35,7 @@ public class ServerSocket implements Callable<String> {
             byte[] hostBytes = b.array();
             InetAddress client = InetAddress.getByAddress(hostBytes);
             System.out.println("Message comes from " + client.getHostAddress() + " port: " + buf.getPort());
-            server.send(new UDPPacket(buf.getMessage(),
-                    buf.getBufLen(),
-                    new InetSocketAddress(client, buf.getPort())));
+            server.send(new UDPPacket(buf.getMessage(), buf.getBufLen(), AbstractUDPSocket.hostToInt("127.0.0.1"), 8888));
             if (false)
                 break;
         }

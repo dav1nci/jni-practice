@@ -6,6 +6,8 @@
 ./src/com/sock/udp/AbstractUDPSocket.java
 ./src/com/sock/udp/UDPPacket.java
 ./src/com/sock/Application.java
-./src/com/sock/test/ServerSocket.java
-./src/com/sock/test/ClientSocket.java
-./src/com/sock/test/DBLTestClient.java
+./src/com/sock/test/udp_test/ServerSocket.java
+./src/com/sock/test/udp_test/ClientSocket.java
+./src/com/sock/test/udp_test/DBLTestClient.java
+./src/com/sock/test/tcp_test/KernelClient.java
+./src/com/sock/test/tcp_test/KernelServer.java

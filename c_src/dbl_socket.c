@@ -46,8 +46,6 @@ int send_handles_num = 0;
 enum dbl_recvmode rmode = DBL_RECV_DEFAULT;
 
 JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_init(JNIEnv *env, jclass class){
-    //char *desc = "Description:\n\tdbl_pingpong\n\tMeasures UDP pingpong latency using the DBL API.\n\tWhen the client and server machines are connected back-to-back (switchless),\n\tthe expected half-round trip latency is 3 to 4 microseconds.\n\nExample:\n\t[server]\n\t\t./dbl_pingpong -s -l 192.168.1.1 -p 3333 -i 10000\n\n\t[client]\n\t\t./dbl_pingpong -h 192.168.1.1 -l 192.168.1.2 -p 3333 -i 10000\n";
-    //printf("Description: \n%s", desc);
     printf("Try to dbl_init()\n");
     DBL_Safe(dbl_init(DBL_VERSION_API));
     return 0;
@@ -172,28 +170,19 @@ JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_receiveFromC(JNIEnv *env, 
     printf("C: After dbl_recvfrom() from dev = %d\n", (int)devId);
     jclass udp_packet_class = (*env) -> GetObjectClass(env, packet);
 
-    jfieldID fidAddress_from = (*env) -> GetFieldID(env, udp_packet_class, "address", "Ljava/net/InetAddress;");
-    jfieldID fidBuf          = (*env) -> GetFieldID(env, udp_packet_class, "buf", "[B");
-    jfieldID fidPort_from    = (*env) -> GetFieldID(env, udp_packet_class, "port", "I");
-	
-	jfieldID fidAddress_to = (*env) -> GetFieldID(env, udp_packet_class, "toAddr", "Ljava/net/InetAddress;");
-    jfieldID fidPort_to    = (*env) -> GetFieldID(env, udp_packet_class, "toPort", "I");
-
-    jclass inet_address_class = (*env) -> FindClass(env, "java/net/InetAddress");
-    jmethodID inet_addr_getByName = (*env) -> GetStaticMethodID(env, inet_address_class, "getByName", "(Ljava/lang/String;)Ljava/net/InetAddress;");
-	
-    jstring host_from = (*env) -> NewStringUTF(env, inet_ntoa(rxinfo.sin_from.sin_addr));
-	jstring host_to   = (*env) -> NewStringUTF(env, inet_ntoa(rxinfo.sin_to.sin_addr));
-    jobject inet_address_from = (*env) -> CallStaticObjectMethod(env, inet_address_class, inet_addr_getByName, host_from);
-	jobject inet_address_to   = (*env) -> CallStaticObjectMethod(env, inet_address_class, inet_addr_getByName, host_to  );
+    jfieldID fidAddress_from = (*env) -> GetFieldID(env, udp_packet_class, "address", "I" );
+    jfieldID fidBuf          = (*env) -> GetFieldID(env, udp_packet_class, "buf",     "[B");
+    jfieldID fidPort_from    = (*env) -> GetFieldID(env, udp_packet_class, "port",    "I" );
+    jfieldID fidAddress_to   = (*env) -> GetFieldID(env, udp_packet_class, "toAddr",  "I" );
+    jfieldID fidPort_to      = (*env) -> GetFieldID(env, udp_packet_class, "toPort",  "I" );
 
     jbyteArray message = (*env) -> NewByteArray(env, (int)bufLen);
     (*env) -> SetByteArrayRegion(env, message, 0, (int)bufLen,  buf);
-    (*env) -> SetObjectField(    env, packet,  fidAddress_from, inet_address_from);
-	(*env) -> SetObjectField(    env, packet,  fidAddress_to,   inet_address_to);
     (*env) -> SetObjectField(    env, packet,  fidBuf,          message);
+    (*env) -> SetIntField(       env, packet,  fidAddress_from, rxinfo.sin_from.sin_addr.s_addr);
+    (*env) -> SetIntField(       env, packet,  fidAddress_to,   rxinfo.sin_to.sin_addr.s_addr);
     (*env) -> SetIntField(       env, packet,  fidPort_from,    ntohs(rxinfo.sin_from.sin_port));
-	(*env) -> SetIntField(       env, packet,  fidPort_to,      ntohs(rxinfo.sin_to.sin_port));
+    (*env) -> SetIntField(       env, packet,  fidPort_to,      ntohs(rxinfo.sin_to.sin_port));
 }
 
 JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_mcastJoinC(JNIEnv *env, jobject obj, jint channId, jint ipAddr){
@@ -226,7 +215,7 @@ JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_deviceGetAttrsC(JNIEnv *en
     jfieldID fidrecvqFilterMode = (*env) -> GetFieldID(env, device_attr_class, "recvqFilterMode", "I");
     jfieldID fidrecvqSize       = (*env) -> GetFieldID(env, device_attr_class, "recvqSize",       "I");
     jfieldID fidhwTimestamping  = (*env) -> GetFieldID(env, device_attr_class, "hwTimestamping",  "I");
-    
+
     struct dbl_device_attrs attrs_c;
     printf("C: Try to dbl_device_get_attrs()\n");
     DBL_Safe(dbl_device_get_attrs((*devices[devId]), &attrs_c));

@@ -15,6 +15,15 @@ import java.util.jar.Pack200;
  * Created by stdima on 18.07.16.
  */
 public class KernelTCPSocket {
+
+    public static int MSG_CONFIRM = 2048;
+    public static int MSG_DONTROUTE = 4;
+    public static int MSG_DONTWAIT = 64;
+    public static int MSG_EOR = 128;
+    public static int MSG_MORE = 32768;
+    public static int MSG_NOSIGNAL = 16384;
+    public static int MSG_OOB = 1;
+
     static {
         System.loadLibrary("kernel_tcp");
     }
@@ -74,11 +83,11 @@ public class KernelTCPSocket {
     }
 
     public void receive(KernelTCPSocket socket, byte[] buf, int flag) {
-        buf = receiveC(this.sockId, flag);
+        buf = receiveC(this.sockId, buf.length, flag);
     }
 
     public void receive(byte buf[], int flag) {
-        buf = receiveC(this.sockId, flag);
+        buf = receiveC(this.sockId, buf.length, flag);
     }
 
     public void close() {
@@ -86,16 +95,16 @@ public class KernelTCPSocket {
     }
 
     public void setReceiveTimeout(int sec, long microsec) {
-        setTimeoutReceiveC(sec, microsec);
+        setTimeoutReceiveC(this.sockId, sec, microsec);
     }
 
     public void setSendTimeout(int sec, long microsec) {
-        setTimeoutSendC(sec, microsec);
+        setTimeoutSendC(this.sockId, sec, microsec);
     }
 
     public void setReuseAddr(boolean flag) {
         int val = (flag)? 1 : 0;
-        setReuseAddrC(val);
+        setReuseAddrC(this.sockId, val);
     }
 
     public boolean isBound() {
@@ -130,9 +139,9 @@ public class KernelTCPSocket {
     private native void acceptC(int sockId, KernelTCPSocket socket);
     private native void connectC(int sockId, int host, int port);
     private native void sendC(int sockId, byte[] buf, int bufLen, int flag);
-    private native byte[] receiveC(int sockId, int flag);
-    private native void setTimeoutReceiveC(int sec, long microsec);
-    private native void setTimeoutSendC(int sec, long microsec);
-    private native void setReuseAddrC(int flag);
+    private native byte[] receiveC(int sockId, int bufLen, int flag);
+    private native void setTimeoutReceiveC(int sockId, int sec, long microsec);
+    private native void setTimeoutSendC(int sockId, int sec, long microsec);
+    private native void setReuseAddrC(int sockId, int flag);
     private native void closeC(int sockId);
 }

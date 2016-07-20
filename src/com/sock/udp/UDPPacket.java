@@ -9,12 +9,12 @@ import java.nio.ByteOrder;
 
 public class UDPPacket {
 
-    private InetAddress address;
+    private int address;
     private int port;
     private byte[] buf;
     private int bufLen;
 	
-	private InetAddress toAddr;
+	private int toAddr;
 	private int toPort;
 
     /**
@@ -26,27 +26,11 @@ public class UDPPacket {
      * @param   address  the destination address.
      * @param   port     the destination port number.
      */
-    public UDPPacket(byte[] buf, int bufLen, InetAddress address, int port) {
+    public UDPPacket(byte[] buf, int bufLen, int address, int port) {
         this.buf = buf;
         this.bufLen = bufLen;
         this.address = address;
         this.port = port;
-    }
-
-    /**
-     * Constructs a datagram packet for sending packets of length
-     * bufLen to the specified port number on the specified host.
-     *
-     * @param   buf      the packet data.
-     * @param   bufLen   the packet data length.
-     * @param   address  the destination socket address.
-     */
-    public UDPPacket(byte[] buf, int bufLen, SocketAddress address) {
-        this.bufLen = bufLen;
-        this.buf = buf;
-        InetSocketAddress addr = (InetSocketAddress) address;
-        this.address = addr.getAddress();
-        this.port = addr.getPort();
     }
 
     /**
@@ -62,7 +46,7 @@ public class UDPPacket {
     }
 
     public int getHost() {
-        return ByteBuffer.wrap(this.address.getAddress()).order(ByteOrder.LITTLE_ENDIAN).getInt();
+        return address;
     }
 
     public int getPort() {
@@ -81,7 +65,7 @@ public class UDPPacket {
         this.buf = buf;
     }
 
-    public void setAddress(InetAddress address) {
+    public void setAddress(int address) {
         this.address = address;
     }
 
@@ -90,7 +74,7 @@ public class UDPPacket {
     }
 	
 	public int getToAddr() {
-        return ByteBuffer.wrap(this.toAddr.getAddress()).order(ByteOrder.LITTLE_ENDIAN).getInt();
+        return this.toAddr;
     }
 	
 	public int getToPort() {

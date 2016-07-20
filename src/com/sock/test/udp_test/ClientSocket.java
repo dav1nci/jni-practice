@@ -1,5 +1,6 @@
-package com.sock.test;
+package com.sock.test.udp_test;
 
+import com.sock.udp.AbstractUDPSocket;
 import com.sock.udp.KernelUDPSocket;
 import com.sock.udp.UDPPacket;
 
@@ -13,10 +14,12 @@ public class ClientSocket implements Callable<String> {
 
     private String message;
     private String address;
+    private int port;
 
-    public ClientSocket(String message, String address) {
+    public ClientSocket(String message, String address, int port) {
         this.message = message;
         this.address = address;
+        this.port = port;
     }
 
     @Override
@@ -24,7 +27,7 @@ public class ClientSocket implements Callable<String> {
         KernelUDPSocket client = new KernelUDPSocket();
         UDPPacket response = new UDPPacket(new byte[512], 512);
         for (int i = 0; i < 5; i++){
-            client.send(new UDPPacket(this.message.getBytes(), message.length(), new InetSocketAddress(address, 8888)));
+            client.send(new UDPPacket(this.message.getBytes(), message.length(), AbstractUDPSocket.hostToInt(address), this.port));
             client.receive(response);
             System.out.println("In client socket responce is");
             for (byte j : response.getMessage())

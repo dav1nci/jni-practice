@@ -53,14 +53,13 @@ public class DBLUDPSocket extends AbstractUDPSocket {
     private int openFlag = -1;
 
 
-
-    public DBLUDPSocket(SocketAddress address, int flag) {
-        if (!ipInUse.containsKey(((InetSocketAddress) address).getHostString())){
+    public DBLUDPSocket(String address, int flag) throws Exception {
+        if (!ipInUse.containsKey(address)){
             this.deviceId = createDeviceC(hostToInt(address), flag);
             this.openFlag = flag;
-            ipInUse.put(((InetSocketAddress) address).getHostString(), this.deviceId);
+            ipInUse.put((address), this.deviceId);
         } else {
-            this.deviceId = ipInUse.get(((InetSocketAddress) address).getHostString());
+            this.deviceId = ipInUse.get(address);
         }
         this.closed = false;
     }
@@ -75,12 +74,12 @@ public class DBLUDPSocket extends AbstractUDPSocket {
     }
 
     @Override
-    public void bind(SocketAddress addr) throws Exception {
+    public void bind(int address, int port) throws Exception {
         //if (bound)
         //    throw new Exception("Socket already bound to port " + this.getLocalPort());
         //if (bindFlag == -1) {
-        this.channelId = bindC(this.deviceId, this.bindFlag, ((InetSocketAddress) addr).getPort());
-        this.port = ((InetSocketAddress) addr).getPort();
+        this.channelId = bindC(this.deviceId, this.bindFlag, port);
+        this.port = port;
         this.bound = true;
         //}else
         //    throw new Exception("Bind flag is not specified");
@@ -94,15 +93,9 @@ public class DBLUDPSocket extends AbstractUDPSocket {
     }
 
     @Override
-    public void connect(SocketAddress addr) {
-        this.sendHandleId = sendConnectC(this.channelId, AbstractUDPSocket.hostToInt(addr), ((InetSocketAddress)addr).getPort(), 0, 0);
+    public void connect(int address, int port) {
+        this.sendHandleId = sendConnectC(this.channelId, address, port, 0, 0);
         this.connected = true;
-    }
-
-    @Override
-    public void connect(InetAddress address, int port) {
-        this.connect(new InetSocketAddress(address.getHostAddress(), port));
-		this.connected = true;
     }
 
     @Override
@@ -124,13 +117,13 @@ public class DBLUDPSocket extends AbstractUDPSocket {
     }
 
     @Override
-    public void joinGroup(InetAddress mcastaddr, InetAddress interfaceAddr) {
-        mcastJoinC(this.channelId, hostToInt(mcastaddr));
+    public void joinGroup(int mcastaddr, int interfaceAddr) {
+        mcastJoinC(this.channelId, mcastaddr);
     }
 
     @Override
-    public void leaveGroup(InetAddress mcastaddr, InetAddress interfaceAddr) {
-        mcastLeaveC(this.channelId, hostToInt(mcastaddr));
+    public void leaveGroup(int mcastaddr, int interfaceAddr) {
+        mcastLeaveC(this.channelId, mcastaddr);
     }
 
     @Override
