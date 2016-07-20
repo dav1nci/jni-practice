@@ -24,12 +24,12 @@ bin/com/app/nativecalls/NativeCallsDemo.class:
 win:
 	gcc c_src/kernel_socket.c -o lib/kernel_udp.dll -I"C:\Program Files\Java\jdk1.8.0_91\include" -I"C:\Program Files\Java\jdk1.8.0_91\include\win32" -shared -l"ws2_32"
 	gcc c_src/dbl_socket.c -o lib/dbl_udp.dll -I"C:\Program Files\Java\jdk1.8.0_91\include" -I"C:\Program Files\Java\jdk1.8.0_91\include\win32" -I"C:\DBL_Myri-10G\include" -L"C:\DBL_Myri-10G\lib" -ldbl -Wl,-rpath="C:\DBL_Myri-10G\lib" -shared -l"ws2_32"
-	java -Djava.library.path=lib/ -classpath bin/ com.sock.Application 10.115.66.139 10.115.66.139 8888 2 server
+	java -Djava.library.path=lib/ -classpath bin/ com.sock.Application 10.115.66.139 10.115.66.139 8888 2 server 100
 
 lin:
 	gcc c_src/kernel_socket.c -o lib/libkernel_udp.so -I/usr/lib/jvm/java-8-oracle/include/ -I/usr/lib/jvm/java-8-oracle/include/linux/ -shared -fPIC
 	gcc c_src/dbl_socket.c -o lib/libdbl_udp.so -I/usr/lib/jvm/java-8-oracle/include/ -I/usr/lib/jvm/java-8-oracle/include/linux/ -I/opt/dbl/include -L/opt/dbl/lib -ldbl -Wl,-rpath=/opt/dbl/lib/ -shared -fPIC
-	java -Djava.library.path=lib/ -classpath bin/ com.sock.Application 10.115.66.128 10.115.66.128 8888 4
+	java -Djava.library.path=lib/ -classpath bin/ com.sock.Application 10.115.66.128 10.115.66.128 8888 2 server 100
 
 clean:
 	rm -r bin/
@@ -53,7 +53,7 @@ jar:
 	jar cvfm UDP.jar bin/MANIFEST.MF -C bin/ . lib/
 
 run:
-	java -Djava.library.path=lib/ -jar UDP.jar 10.115.66.185 10.115.55.185 8888 2
+	java -Djava.library.path=lib/ -jar UDP.jar 10.115.66.185 10.115.55.185 8888 2 100
 
 ex:
 	gcc dbl_pingpong.c -o ex.exe -I"C:\DBL_Myri-10G\include" -I"C:\DBL_Myri-10G\share\doc\examples" -L"C:\DBL_Myri-10G\lib" -ldbl -Wl,-rpath="C:\DBL_Myri-10G\lib"

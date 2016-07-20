@@ -3,10 +3,7 @@ package com.sock;
 import com.sock.test.ClientSocket;
 import com.sock.test.DBLTestClient;
 import com.sock.test.ServerSocket;
-import com.sock.udp.DBLUDPSocket;
-import com.sock.udp.UDPPacket;
-import com.sock.udp.KernelUDPSocket;
-import com.sock.udp.DeviceAttributes;
+import com.sock.udp.*;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -161,9 +158,10 @@ public class Application {
 			System.out.println();
 			System.out.println("Java: Message comes from " + response.getHost() + ":" + response.getPort());
 			System.out.println("Java: Message comes to " + response.getToAddr() + ":" + response.getToPort());
-			UDPPacket packet = new UDPPacket(message.getBytes(), message.length(), new InetSocketAddress(clientAddr, port));
+			UDPPacket packet = new UDPPacket(message.getBytes(), message.length(), new InetSocketAddress(AbstractUDPSocket.hostToString(response.getHost()), response.getPort()));
 			server.send(packet);
-		}
+            System.out.println("Java: response message sended");
+        }
 		
 	}
 	

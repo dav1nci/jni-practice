@@ -97,5 +97,19 @@ public abstract class AbstractUDPSocket {
         return ByteBuffer.wrap(address.getAddress()).order(ByteOrder.LITTLE_ENDIAN).getInt();
     }
 
+    public static String hostToString(int host) {
+        ByteBuffer b = ByteBuffer.allocate(4);
+        b.order(ByteOrder.LITTLE_ENDIAN);
+        b.putInt(host);
+        byte[] hostBytes = b.array();
+        InetAddress client = null;
+        try {
+            client = InetAddress.getByAddress(hostBytes);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        return client.getHostAddress();
+    }
+
 
 }
