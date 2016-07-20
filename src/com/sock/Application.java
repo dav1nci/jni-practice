@@ -48,6 +48,7 @@ public class Application {
 				break;
             case "5":
                 testTCPKernel(server, client, port);
+                break;
         }
     }
 
@@ -157,7 +158,6 @@ public class Application {
 			UDPPacket packet = new UDPPacket(message.getBytes(), message.length(), AbstractUDPSocket.hostToInt(clientAddr), port);
 			server.send(packet);
 		}
-
 	}
 
 	public static void startDblClient(String serverAddr, String clientAddr, int port, int interval) throws Exception {
@@ -166,6 +166,7 @@ public class Application {
         Callable<String> client2 = new DBLTestClient(serverAddr, clientAddr, port + 1, "Hello from client2", interval);
 
         Future<String> result1 = pool.submit(client1);
+        Thread.sleep(1000);
         Future<String> result2 = pool.submit(client2);
         result1.get();
         result2.get();
