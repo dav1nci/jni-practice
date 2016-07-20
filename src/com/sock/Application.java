@@ -42,6 +42,9 @@ public class Application {
             case "4":
                 testMulticastKernel(client, mcasAddr, port);
 				break;
+            case "5":
+                testDBLSocket(server, client, port);
+                break;
         }
     }
 
@@ -171,6 +174,7 @@ public class Application {
         Callable<String> client2 = new DBLTestClient(serverAddr, clientAddr, port + 1, "Hello from client2", interval);
 
         Future<String> result1 = pool.submit(client1);
+        Thread.sleep(1000);
         Future<String> result2 = pool.submit(client2);
         result1.get();
         result2.get();

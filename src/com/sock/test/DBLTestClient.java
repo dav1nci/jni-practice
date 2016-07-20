@@ -35,11 +35,11 @@ public class DBLTestClient implements Callable<String> {
 
         //sending part
         int bufLen = message.length();
-        UDPPacket packet = new UDPPacket(message.getBytes(), message.length(), new InetSocketAddress(serverAddr, port));
+        UDPPacket packet = new UDPPacket(message.getBytes(), message.length(), new InetSocketAddress(serverAddr, 8888));
         UDPPacket response = new UDPPacket(new byte[100], 100);
 
         System.out.println("Java: try to client.connect()");
-        client.connect(new InetSocketAddress(serverAddr, port));
+        //client.connect(new InetSocketAddress(serverAddr, port));
         client.setRecvMode(DBLUDPSocket.DBL_RECV_DEFAULT);
 
         for (int i = 0; i < 30; ++i) {
