@@ -1,12 +1,5 @@
 package com.sock.udp;
 
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
 public class UDPPacket {
 
     private int address;

@@ -7,6 +7,78 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+/*
+ * Class:     com_sock_tcp_DBLTCPSocket
+ * Method:    tcpSendC
+ * Signature: (I[BII)I
+ */
+JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpSendC
+  (JNIEnv *, jobject, jint, jbyteArray, jint, jint);
+
+/*
+ * Class:     com_sock_tcp_DBLTCPSocket
+ * Method:    tcpAcceptC
+ * Signature: (ILcom/sock/tcp/DBLTCPSocket;)V
+ */
+JNIEXPORT void JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpAcceptC
+  (JNIEnv *, jobject, jint, jobject);
+
+/*
+ * Class:     com_sock_tcp_DBLTCPSocket
+ * Method:    tcpListenC
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpListenC
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     com_sock_tcp_DBLTCPSocket
+ * Method:    tcpReceiveC
+ * Signature: (IIILcom/sock/tcp/DBLReceiveInfo;)[B
+ */
+JNIEXPORT jbyteArray JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpReceiveC
+  (JNIEnv *, jobject, jint, jint, jint, jobject);
+
+/*
+ * Class:     com_sock_tcp_DBLTCPSocket
+ * Method:    tcpReceiveMsgC
+ * Signature: (III)[Lcom/sock/tcp/DBLReceiveInfo;
+ */
+JNIEXPORT jobjectArray JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpReceiveMsgC
+  (JNIEnv *, jobject, jint, jint, jint);
+
+/*
+ * Class:     com_sock_tcp_DBLTCPSocket
+ * Method:    tcpPollC
+ * Signature: ([III)I
+ */
+JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpPollC
+  (JNIEnv *, jobject, jintArray, jint, jint);
+
+/*
+ * Class:     com_sock_tcp_DBLTCPSocket
+ * Method:    getChannelOptionsC
+ * Signature: (III)I
+ */
+JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_getChannelOptionsC
+  (JNIEnv *, jobject, jint, jint, jint);
+
+/*
+ * Class:     com_sock_tcp_DBLTCPSocket
+ * Method:    setChannelOptionsC
+ * Signature: (IIII)V
+ */
+JNIEXPORT void JNICALL Java_com_sock_tcp_DBLTCPSocket_setChannelOptionsC
+  (JNIEnv *, jobject, jint, jint, jint, jint);
+
+/*
+ * Class:     com_sock_tcp_DBLTCPSocket
+ * Method:    getChannelTypeC
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_getChannelTypeC
+  (JNIEnv *, jobject, jint);
+
 #ifdef __cplusplus
 }
 #endif

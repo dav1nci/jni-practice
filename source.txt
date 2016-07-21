@@ -1,4 +1,5 @@
 ./src/com/sock/tcp/DBLTCPSocket.java
+./src/com/sock/tcp/DBLReceiveInfo.java
 ./src/com/sock/tcp/KernelTCPSocket.java
 ./src/com/sock/udp/DeviceAttributes.java
 ./src/com/sock/udp/DBLUDPSocket.java

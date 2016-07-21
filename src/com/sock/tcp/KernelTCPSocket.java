@@ -37,11 +37,11 @@ public class KernelTCPSocket {
         this.sockId = createSocketC();
     }
 
-    public KernelTCPSocket(String address, int port) throws Exception {
-        this.connectedSockets = new ArrayList<>();
-        this.sockId = createSocketC();
-        this.connect(address, port);
-    }
+//    public KernelTCPSocket(String address, int port) throws Exception {
+//        this.connectedSockets = new ArrayList<>();
+//        this.sockId = createSocketC();
+//        this.connect(address, port);
+//    }
 
     public void bind(String addr, int port) throws Exception {
         bindC(this.sockId, hostToInt(addr), port);
@@ -74,7 +74,7 @@ public class KernelTCPSocket {
         if (connectedSockets.contains(socket.getSockId())) {
             sendC(socket.getSockId(), buf, buf.length, flag);
         } else {
-            throw new Exception("socket is not connected");
+            //throw new Exception("socket is not connected");
         }
     }
 
@@ -82,7 +82,7 @@ public class KernelTCPSocket {
         if (isConnected()) {
             sendC(this.sockId, buf, buf.length, flag);
         } else {
-            throw new Exception("this socket is not connected");
+            //throw new Exception("this socket is not connected");
         }
     }
 

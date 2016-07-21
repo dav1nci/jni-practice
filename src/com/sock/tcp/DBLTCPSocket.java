@@ -1,13 +1,6 @@
 package com.sock.tcp;
 
 import com.sock.udp.DBLUDPSocket;
-import com.sun.deploy.util.ArrayUtil;
-
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * Created by stdima on 18.07.16.

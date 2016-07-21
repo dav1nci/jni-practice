@@ -164,15 +164,15 @@ public class DBLUDPSocket extends AbstractUDPSocket {
     private static native int init();
     private native int createDeviceC(int host, int flag);
     //private native int createDeviceByInterfaceC(String interfaceName, int flag);
-    private native void sendC(int handleId, byte[] buf, int bufLen, int flag);
-    private native void sendToC(int channId, int host, int port, byte[] buf, int bufLen, int flag);
+    private native int sendC(int handleId, byte[] buf, int bufLen, int flag);
+    private native int sendToC(int channId, int host, int port, byte[] buf, int bufLen, int flag);
     private native int sendConnectC(int channId, int host, int port, int flag, int ttl);
     private native int bindC(int devId, int flag, int port);
     private native int bindAddrC(int devId, int interfaceIp, int flag, int port);
-    private native void receiveFromC(int devId, int recvMode, UDPPacket packet, int bufLen);
+    private native int receiveFromC(int devId, int recvMode, UDPPacket packet, int bufLen);
 
-    private native void mcastJoinC(int channId, int ipAddr);
-    private native void mcastLeaveC(int channId, int ipAddr);
+    private native int mcastJoinC(int channId, int ipAddr);
+    private native int mcastLeaveC(int channId, int ipAddr);
 
     private native void deviceGetAttrsC(int devId, DeviceAttributes attrs);
     private native void deviceSetAttrsC(int devId, int recvqFilterMode, int recvqSize, int hwTimestamping);
@@ -180,7 +180,7 @@ public class DBLUDPSocket extends AbstractUDPSocket {
     private native void deviceEnableC(int devId);
 
     private native void shutdownC(int devId);
-    private native void unbindC(int channId);
-    private native void sendDisconnectC(int handleId);
-    private native void closeC(int devId);
+    private native int unbindC(int channId);
+    private native int sendDisconnectC(int handleId);
+    private native int closeC(int devId);
 }

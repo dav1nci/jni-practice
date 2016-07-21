@@ -47,8 +47,11 @@ enum dbl_recvmode rmode = DBL_RECV_DEFAULT;
 
 JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_init(JNIEnv *env, jclass class){
     printf("Try to dbl_init()\n");
-    DBL_Safe(dbl_init(DBL_VERSION_API));
-    return 0;
+    int res = dbl_init(DBL_VERSION_API);
+    if (res != 0) {
+        printf("dlb_init() return %d\n", res);
+    }
+    return res;
 }
 
 JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_createDeviceC(JNIEnv *env, jobject obj, jint host, jint flag){
@@ -76,15 +79,16 @@ JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_createDeviceC(JNIEnv *env,
     return devices_num - 1;
 }
 
-JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_sendC(JNIEnv *env, jobject obj, jint handleId, jbyteArray buf, jint bufLen, jint flag){
+JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_sendC(JNIEnv *env, jobject obj, jint handleId, jbyteArray buf, jint bufLen, jint flag){
     jboolean is_copy;
     char *buf_c = (*env) -> GetByteArrayElements(env, buf, &is_copy);
     printf("C: try to dbl_send() message: %s with send_handles_id = %d\n", buf_c, handleId);
-    DBL_Safe(dbl_send((*send_handles[handleId]), buf_c, (int)bufLen, flag));
+    int res = dbl_send((*send_handles[handleId]), buf_c, (int)bufLen, flag);
     (*env) -> ReleaseByteArrayElements(env, buf, buf_c, JNI_ABORT);
+    return res;
 }
 
-JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_sendToC(JNIEnv *env, jobject obj, jint channId, jint host, jint port, jbyteArray buf, jint bufLen, jint flag){
+JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_sendToC(JNIEnv *env, jobject obj, jint channId, jint host, jint port, jbyteArray buf, jint bufLen, jint flag){
     assert((int) bufLen > 1);
     struct sockaddr_in remote;
     memset(&remote, 0, sizeof(remote));
@@ -99,7 +103,7 @@ JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_sendToC(JNIEnv *env, jobje
     jboolean is_copy;
     char *buf_c = (*env) -> GetByteArrayElements(env, buf, &is_copy);
     printf("C: try to dbl_send_to() message: %s with channId = %d host = %d, port = %d flag = %d\n", buf_c, channId, host, port, 0);
-    DBL_Safe(dbl_sendto((*channels[channId]), &remote, buf_c, (int)bufLen, 0));
+    return dbl_sendto((*channels[channId]), &remote, buf_c, (int)bufLen, 0);
 }
 
 JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_sendConnectC(JNIEnv *env, jobject obj, jint channId, jint host, jint port, jint flag, jint ttl){
@@ -160,13 +164,13 @@ JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_bindAddrC(JNIEnv *env, job
     return channels_num - 1;
 }
 
-JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_receiveFromC(JNIEnv *env, jobject obj, jint devId, jint recvMode, jobject packet, jint bufLen){
+JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_receiveFromC(JNIEnv *env, jobject obj, jint devId, jint recvMode, jobject packet, jint bufLen){
     assert((int)devId >= 0);
     char buf[(int)bufLen];
     struct dbl_recv_info rxinfo;
     enum dbl_recvmode rmode = recvMode;
     printf("C: Try to dbl_recvfrom() from dev = %d\n", (int)devId);
-    DBL_Safe(dbl_recvfrom((*devices[(int)devId]), rmode, buf, bufLen, &rxinfo));
+    int res = dbl_recvfrom((*devices[(int)devId]), rmode, buf, bufLen, &rxinfo);
     printf("C: After dbl_recvfrom() from dev = %d\n", (int)devId);
     jclass udp_packet_class = (*env) -> GetObjectClass(env, packet);
 
@@ -183,9 +187,10 @@ JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_receiveFromC(JNIEnv *env, 
     (*env) -> SetIntField(       env, packet,  fidAddress_to,   rxinfo.sin_to.sin_addr.s_addr);
     (*env) -> SetIntField(       env, packet,  fidPort_from,    ntohs(rxinfo.sin_from.sin_port));
     (*env) -> SetIntField(       env, packet,  fidPort_to,      ntohs(rxinfo.sin_to.sin_port));
+    return res;
 }
 
-JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_mcastJoinC(JNIEnv *env, jobject obj, jint channId, jint ipAddr){
+JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_mcastJoinC(JNIEnv *env, jobject obj, jint channId, jint ipAddr){
     struct in_addr interface_ip;
     memset(&interface_ip, 0, sizeof(interface_ip));
 #ifdef _WIN32
@@ -194,10 +199,10 @@ JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_mcastJoinC(JNIEnv *env, jo
     interface_ip.s_addr = (int)ipAddr;
 #endif
     printf("Try to dbl_mcast_join() channelId = %d, mcastAddr = %d\n", channId, ipAddr);
-    DBL_Safe(dbl_mcast_join((*channels[channId]), &interface_ip, NULL));
+    return dbl_mcast_join((*channels[channId]), &interface_ip, NULL);
 }
 
-JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_mcastLeaveC(JNIEnv *env, jobject obj, jint channId, jint ipAddr){
+JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_mcastLeaveC(JNIEnv *env, jobject obj, jint channId, jint ipAddr){
     struct in_addr interface_ip;
     memset(&interface_ip, 0, sizeof(interface_ip));
 #ifdef _WIN32
@@ -206,7 +211,7 @@ JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_mcastLeaveC(JNIEnv *env, j
     interface_ip.s_addr = (int)ipAddr;
 #endif
     printf("Try to dbl_mcast_leave() channelId = %d, mcastAddr = %d\n", channId, ipAddr);
-    DBL_Safe(dbl_mcast_leave((*channels[channId]), &interface_ip));
+    return dbl_mcast_leave((*channels[channId]), &interface_ip);
 }
 
 JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_deviceGetAttrsC(JNIEnv *env, jobject obj, jint devId, jobject attrs){
@@ -245,17 +250,17 @@ JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_shutdownC(JNIEnv *env, job
     //DBL_Safe(dbl_shutdown((*devices[devId]), 0));
 }
 
-JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_unbindC(JNIEnv *env, jobject obj, jint channId){
+JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_unbindC(JNIEnv *env, jobject obj, jint channId){
     printf("C: Try to dbl_unbind()\n");
-    DBL_Safe(dbl_unbind((*channels[channId])));
+    return dbl_unbind((*channels[channId]));
 }
 
-JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_closeC(JNIEnv *env, jobject obj, jint devId){
+JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_closeC(JNIEnv *env, jobject obj, jint devId){
     printf("C: Try to dbl_close()\n");
-    DBL_Safe(dbl_close((*devices[devId])));
+    return dbl_close((*devices[devId]));
 }
 
-JNIEXPORT void JNICALL Java_com_sock_udp_DBLUDPSocket_sendDisconnectC(JNIEnv *env, jobject obj, jint handleId){
+JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_sendDisconnectC(JNIEnv *env, jobject obj, jint handleId){
     printf("C: Try to dbl_send_disconnect()\n");
-    DBL_Safe(dbl_send_disconnect((*send_handles[(int)handleId])));
+    return dbl_send_disconnect((*send_handles[(int)handleId]));
 }
