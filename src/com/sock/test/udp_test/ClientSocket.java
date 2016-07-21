@@ -25,16 +25,17 @@ public class ClientSocket implements Callable<String> {
     @Override
     public String call() throws Exception {
         KernelUDPSocket client = new KernelUDPSocket();
-        UDPPacket response = new UDPPacket(new byte[512], 512);
-        for (int i = 0; i < 5; i++){
+        UDPPacket response = new UDPPacket(new byte[100], 100);
+        for (int i = 0; i < 1; i++){
             client.send(new UDPPacket(this.message.getBytes(), message.length(), AbstractUDPSocket.hostToInt(address), this.port));
             client.receive(response);
-            System.out.println("In client socket responce is");
+            System.out.println("In client socket responce is \"" + new String(response.getMessage()) + "\"");
             for (byte j : response.getMessage())
                 System.out.print((char)j);
             System.out.println();
         }
         client.close();
+        System.out.println(message + "CLIENT!!!!! DONE!!!!");
         return "Client ended";
     }
 }

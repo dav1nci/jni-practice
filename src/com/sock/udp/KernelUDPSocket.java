@@ -59,12 +59,12 @@ public class KernelUDPSocket extends AbstractUDPSocket{
 
     @Override
     public void receive(UDPPacket packet) throws Exception {
-        if (isConnected())
+        if (isConnected()) {
             receiveC(socketId, packet, packet.getBufLen());
-        else {
-            receiveFromC(this.socketId, packet, packet.getBufLen());
             packet.setAddress(this.getRemoteAddress());
             packet.setPort(this.getPort());
+        } else {
+            receiveFromC(this.socketId, packet, packet.getBufLen());
         }
     }
 

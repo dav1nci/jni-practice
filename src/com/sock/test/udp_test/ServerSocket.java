@@ -24,21 +24,17 @@ public class ServerSocket implements Callable<String> {
 
     @Override
     public String call() throws Exception {
-        UDPPacket buf = new UDPPacket(new byte[512], 512);
+        UDPPacket buf = new UDPPacket(new byte[100], 100);
 //        for (int i = 0; i < 5; ++i){
         while(true){
             server.receive(buf);
             System.out.println("Server: message is \"" + new String(buf.getMessage()) + "\"");
-            ByteBuffer b = ByteBuffer.allocate(4);
-            b.order(ByteOrder.LITTLE_ENDIAN);
-            b.putInt(buf.getHost());
-            byte[] hostBytes = b.array();
-            InetAddress client = InetAddress.getByAddress(hostBytes);
-            System.out.println("Message comes from " + client.getHostAddress() + " port: " + buf.getPort());
-            server.send(new UDPPacket(buf.getMessage(), buf.getBufLen(), AbstractUDPSocket.hostToInt("127.0.0.1"), 8888));
+            System.out.println("Message comes from " + buf.getHost() + " port: " + buf.getPort());
+            server.send(new UDPPacket("Server response".getBytes(), buf.getBufLen(), buf.getHost(), buf.getPort()));
             if (false)
                 break;
         }
+        System.out.println("Closing server");
         server.close();
         return "Server done";
     }

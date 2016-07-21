@@ -15,8 +15,6 @@ import java.util.concurrent.*;
 public class Application {
 
     public static void main(String[] args) throws Exception {
-
-        System.out.println("127.0.0.1 in int = " + AbstractUDPSocket.hostToInt("127.0.0.1"));
         String server, client;
 		int port;
         String mcasAddr = "224.5.5.5";
