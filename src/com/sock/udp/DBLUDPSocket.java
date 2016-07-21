@@ -1,9 +1,7 @@
 package com.sock.udp;
 
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.NetworkInterface;
-import java.net.SocketAddress;
+import com.sock.tcp.DBLTCPSocket;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,12 +14,6 @@ public class DBLUDPSocket extends AbstractUDPSocket {
     static {
         System.loadLibrary("dbl_udp");
         initStatus = init();
-    }
-
-    static boolean checkInit(){
-        if (initStatus != 0)
-            return false;
-        return true;
     }
 
     private static Map<String, Integer> ipInUse = new HashMap<>(2); // 2 is random number of amount of devices
@@ -40,12 +32,11 @@ public class DBLUDPSocket extends AbstractUDPSocket {
     // dbl_sendto() and dbl_send() flags
     public static int DBL_NONBLOCK = 4;
 	
-	 public static int DBL_RECV_DEFAULT = 0;
+    public static int DBL_RECV_DEFAULT = 0;
 
-
-    private int deviceId;
-    private int channelId;
-    private int sendHandleId;
+    protected int deviceId;
+    protected int channelId;
+    protected int sendHandleId;
 
     private int sendFlag = 0;
     private int bindFlag = -1;
@@ -62,6 +53,9 @@ public class DBLUDPSocket extends AbstractUDPSocket {
             this.deviceId = ipInUse.get(address);
         }
         this.closed = false;
+    }
+
+    public DBLUDPSocket() {
     }
 
     @Override

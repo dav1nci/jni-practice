@@ -8,8 +8,6 @@ import com.sock.test.udp_test.DBLTestClient;
 import com.sock.test.udp_test.ServerSocket;
 import com.sock.udp.*;
 
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.util.concurrent.*;
 
 public class Application {

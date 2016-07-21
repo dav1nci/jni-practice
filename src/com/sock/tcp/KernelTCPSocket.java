@@ -127,6 +127,22 @@ public class KernelTCPSocket {
         return sockId;
     }
 
+    public int getAddress() {
+        return address;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public int getRemoteAddress() {
+        return remoteAddress;
+    }
+
+    public int getRemotePort() {
+        return remotePort;
+    }
+
     public static int hostToInt(String host) throws Exception {
         if ( host == null || host.length() < 7 || host.length() > 15)
             throw new Exception("Bad ip address argument1");
