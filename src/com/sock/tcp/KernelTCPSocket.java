@@ -1,12 +1,5 @@
 package com.sock.tcp;
 
-import com.sock.udp.UDPPacket;
-
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.Pack200;
@@ -16,6 +9,9 @@ import java.util.jar.Pack200;
  */
 public class KernelTCPSocket {
 
+    static {
+        System.loadLibrary("kernel_tcp");
+    }
     public static int MSG_CONFIRM = 2048;
     public static int MSG_DONTROUTE = 4;
     public static int MSG_DONTWAIT = 64;
@@ -24,9 +20,10 @@ public class KernelTCPSocket {
     public static int MSG_NOSIGNAL = 16384;
     public static int MSG_OOB = 1;
 
-    static {
-        System.loadLibrary("kernel_tcp");
-    }
+    private int address;
+    private int port;
+    private int remoteAddress;
+    private int remotePort;
 
     private int sockId;
 
@@ -40,14 +37,16 @@ public class KernelTCPSocket {
         this.sockId = createSocketC();
     }
 
-    public KernelTCPSocket(InetAddress address, int port) {
+    public KernelTCPSocket(String address, int port) throws Exception {
         this.connectedSockets = new ArrayList<>();
         this.sockId = createSocketC();
-        this.connect(new InetSocketAddress(address, port));
+        this.connect(address, port);
     }
 
-    public void bind(SocketAddress addr) {
-        bindC(this.sockId, KernelTCPSocket.hostToInt(addr), ((InetSocketAddress) addr).getPort());
+    public void bind(String addr, int port) throws Exception {
+        bindC(this.sockId, hostToInt(addr), port);
+        this.address = hostToInt(addr);
+        this.port = port;
         this.bound = true;
     }
 
@@ -59,11 +58,16 @@ public class KernelTCPSocket {
         KernelTCPSocket result = new KernelTCPSocket();
         acceptC(this.sockId, result);
         connectedSockets.add(result.getSockId());
+        result.remoteAddress = this.address;
+        result.remotePort = this.port;
         return result;
     }
 
-    public void connect(SocketAddress addr) {
-        connectC(this.sockId, hostToInt(addr), ((InetSocketAddress) addr).getPort());
+    public void connect(String addr, int port) throws Exception {
+        connectC(this.sockId, hostToInt(addr), port);
+        this.remoteAddress = hostToInt(addr);
+        this.remotePort = port;
+        this.connected = true;
     }
 
     public void send(KernelTCPSocket socket, byte[] buf, int flag) throws Exception {
@@ -82,12 +86,12 @@ public class KernelTCPSocket {
         }
     }
 
-    public void receive(KernelTCPSocket socket, byte[] buf, int flag) {
-        buf = receiveC(this.sockId, buf.length, flag);
+    public byte[] receive(KernelTCPSocket socket, int bufLen, int flag) {
+        return receiveC(socket.getSockId(), bufLen, flag);
     }
 
-    public void receive(byte buf[], int flag) {
-        buf = receiveC(this.sockId, buf.length, flag);
+    public byte[] receive(int bufLen, int flag) {
+        return receiveC(this.sockId, bufLen, flag);
     }
 
     public void close() {
@@ -123,14 +127,20 @@ public class KernelTCPSocket {
         return sockId;
     }
 
-    public static int hostToInt(SocketAddress address) {
-        return ByteBuffer.wrap(((InetSocketAddress) address).getAddress().getAddress())
-                .order(ByteOrder.LITTLE_ENDIAN)
-                .getInt();
-    }
-
-    public static int hostToInt(InetAddress address) {
-        return ByteBuffer.wrap(address.getAddress()).order(ByteOrder.LITTLE_ENDIAN).getInt();
+    public static int hostToInt(String host) throws Exception {
+        if ( host == null || host.length() < 7 || host.length() > 15)
+            throw new Exception("Bad ip address argument1");
+        String[] ipByStringParts = host.split("\\.");
+        if ( ipByStringParts.length != 4)
+            throw new Exception("Bad ip address argument2");
+        int ipInt = 0;
+        for (int i = 3; i >= 0; --i) {
+            int ipVal = Integer.parseInt(ipByStringParts[i]);
+            if ( ipVal < 0 || ipVal > 255)
+                throw new Exception("Bad ip address argument3");
+            ipInt = (ipInt << 8) + ipVal;
+        }
+        return ipInt;
     }
 
     private native int createSocketC();

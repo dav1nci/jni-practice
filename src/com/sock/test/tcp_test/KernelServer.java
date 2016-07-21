@@ -25,12 +25,22 @@ public class KernelServer implements Callable<Void> {
 
     @Override
     public Void call() throws Exception {
-        socket.bind(new InetSocketAddress(socketAddr, port));
+        socket.bind(socketAddr, port);
         socket.listen(backlog);
-        KernelTCPSocket newConnection = socket.accept();
-        String message = "mess from socket";
-        socket.send(newConnection, message.getBytes(), flag);
+        while (true) {
 
+            System.out.println("Java: try to accept()");
+            KernelTCPSocket newConnection = socket.accept();
+            String message = "mess from socket";
+            System.out.println("Java: server try to send message: " + message);
+            socket.send(newConnection, message.getBytes(), flag);
+            System.out.println("Java: server try to receive message: ");
+            byte[] responce = socket.receive(newConnection, 50, 0);
+            System.out.println("Java: server receive message: " + new String(responce));
+            //socket.close();
+            if (false)
+                break;
+        }
         return null;
     }
 }

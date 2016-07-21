@@ -32,7 +32,7 @@ lin:
 	gcc c_src/kernel_socket.c -o lib/libkernel_udp.so -I/usr/lib/jvm/java-8-oracle/include/ -I/usr/lib/jvm/java-8-oracle/include/linux/ -shared -fPIC
 	gcc c_src/kernel_tcp_socket.c -o lib/libkernel_tcp.so -I/usr/lib/jvm/java-8-oracle/include/ -I/usr/lib/jvm/java-8-oracle/include/linux/ -shared -fPIC
 	gcc c_src/dbl_socket.c -o lib/libdbl_udp.so -I/usr/lib/jvm/java-8-oracle/include/ -I/usr/lib/jvm/java-8-oracle/include/linux/ -I/opt/dbl/include -L/opt/dbl/lib -ldbl -Wl,-rpath=/opt/dbl/lib/ -shared -fPIC
-	java -Djava.library.path=lib/ -classpath bin/ com.sock.Application 10.115.66.128 10.115.66.128 8888 2 server 100
+	java -Djava.library.path=lib/ -classpath bin/ com.sock.Application 10.115.66.133 10.115.66.133 8888 5 server 100
 
 clean:
 	rm -r bin/

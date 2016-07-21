@@ -50,14 +50,30 @@ public class Application {
         }
     }
 
-    private static void testTCPKernel(String serverAddr, String clientAddr, int port) {
+    private static void testTCPKernel(String serverAddr, String clientAddr, int port) throws InterruptedException {
         KernelTCPSocket client1 = new KernelTCPSocket();
         KernelTCPSocket client2 = new KernelTCPSocket();
         KernelTCPSocket server = new KernelTCPSocket();
         ExecutorService pool = Executors.newFixedThreadPool(3);
-//        Callable<Void> serverTask = new KernelServer();
-//        Callable<Void> clientTask1 = new KernelClient();
-//        Callable<Void> clientTask2 = new KernelClient();
+        Callable<Void> serverTask = new KernelServer(server, serverAddr, port, 3, 0);
+        Callable<Void> clientTask1 = new KernelClient(client1, serverAddr, port, 0);
+        Callable<Void> clientTask2 = new KernelClient(client2, serverAddr, port, 0);
+        Future<Void> serverResult = pool.submit(serverTask);
+        Thread.sleep(1000);
+        Future<Void> clientRes = pool.submit(clientTask1);
+        try {
+            clientRes.get();
+            Future<Void> clientRes2 = pool.submit(clientTask2);
+            clientRes2.get();
+            serverResult.get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        pool.shutdown();
+
+        //Callable<Void> clientTask2 = new KernelClient();
     }
 
     public static void concurrentTest(String serverIp, int port) throws Exception {
@@ -68,6 +84,7 @@ public class Application {
         Callable<String> clientTask1 = new ClientSocket("Hello from client1", serverIp, port);
         Callable<String> clientTask2 = new ClientSocket("Hello from client2", serverIp, port);
         Future<String> serverResponse = pool.submit(serverTask);
+        Thread.sleep(1000);
         Future<String> clientResponse1 = pool.submit(clientTask1);
         //Thread.sleep(200);
         Future<String> clientResponse2 = pool.submit(clientTask2);

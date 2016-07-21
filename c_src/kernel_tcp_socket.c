@@ -37,7 +37,7 @@ JNIEXPORT jint JNICALL Java_com_sock_tcp_KernelTCPSocket_createSocketC(JNIEnv *e
         is_init = true;
     }
 #endif
-    if ((s = socket(AF_INET, SOCK_DGRAM, 0)) == 0) {
+    if ((s = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
         throw_new_Exception(env, "cannot create socket");
     }
     return s;
@@ -54,13 +54,14 @@ JNIEXPORT void JNICALL Java_com_sock_tcp_KernelTCPSocket_bindC(JNIEnv *env, jobj
 #endif
     sin.sin_port = htons((int)port);
 
-    printf("Try to bind() socket to port %d\n", port);
+    printf("C: Try to bind() socket to port %d\n", port);
     if (bind((int)sockId, (struct sockaddr *) &sin, sizeof(sin)) < 0) 
         throw_new_Exception(env, "bind() failed, probably port is buisy");
 
 }
 
 JNIEXPORT void JNICALL Java_com_sock_tcp_KernelTCPSocket_listenC(JNIEnv *env, jobject obj, jint sockId, jint backlog) {
+    printf("C: try to listen()\n");
     listen(sockId, backlog);
 }
 
@@ -73,8 +74,16 @@ JNIEXPORT void JNICALL Java_com_sock_tcp_KernelTCPSocket_acceptC(JNIEnv *env, jo
     } else {
         printf("C: new socket created with id = %d\n", new_sock);
         jclass KernelTCPSocket_class = (*env) -> GetObjectClass(env, socket);
-        jfieldID fidsockId = (*env) -> GetFieldID(env, KernelTCPSocket_class, "sockId", "I");
-        (*env) -> SetIntField(env, socket, fidsockId, new_sock);
+        jfieldID fidsockId =  (*env) -> GetFieldID(env, KernelTCPSocket_class, "sockId",  "I");
+        jfieldID fidaddress = (*env) -> GetFieldID(env, KernelTCPSocket_class, "address", "I");
+        jfieldID fidport =    (*env) -> GetFieldID(env, KernelTCPSocket_class, "port",    "I");
+        (*env) -> SetIntField(env, socket, fidsockId,  new_sock);
+#ifdef _WIN32
+        (*env) -> SetIntField(env, socket, fidaddress, client.sin_addr.S_un.S_addr);
+#else
+        (*env) -> SetIntField(env, socket, fidaddress, client.sin_addr.s_addr     );
+#endif
+        (*env) -> SetIntField(env, socket, fidport,    client.sin_port            );
     }
 
 }
@@ -112,6 +121,7 @@ JNIEXPORT jbyteArray JNICALL Java_com_sock_tcp_KernelTCPSocket_receiveC(JNIEnv *
     if(result == -1) {
         throw_new_Exception(env, "Cannot receive failed");
     }
+    printf("C: recv() message = %s\n", buf);
 
     // Creating java byte array and copy receiving message to them
     jbyteArray return_val = (*env) -> NewByteArray(env, bufLen);
