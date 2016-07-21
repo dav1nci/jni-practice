@@ -97,9 +97,9 @@ public class Application {
         //DBLUDPSocket client = new DBLUDPSocket(new InetSocketAddress(clientAddr, 0), DBLUDPSocket.DBL_OPEN_THREADSAFE);
         try {
             server.setBindFlag(DBLUDPSocket.DBL_BIND_REUSEADDR);
-            server.bindAddr(new InetSocketAddress(serverAddr, port));
+            server.bindAddr(serverAddr, port);
 			server2.setBindFlag(DBLUDPSocket.DBL_BIND_REUSEADDR);
-            server2.bindAddr(new InetSocketAddress(serverAddr, port + 1));
+            server2.bindAddr(serverAddr, (port + 1));
             //client.bind(new InetSocketAddress(port));
         } catch (Exception e) {
             e.printStackTrace();
@@ -134,7 +134,7 @@ public class Application {
 
         try {
             server.setBindFlag(DBLUDPSocket.DBL_BIND_REUSEADDR);
-            server.bindAddr(new InetSocketAddress(serverAddr, port));
+            server.bindAddr(serverAddr, port);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -161,13 +161,13 @@ public class Application {
 	public static void startDblClient(String serverAddr, String clientAddr, int port, int interval) throws Exception {
 		ExecutorService pool = Executors.newFixedThreadPool(2);
         Callable<String> client1 = new DBLTestClient(serverAddr, clientAddr, port, "Hello from clent1", interval);
-        Callable<String> client2 = new DBLTestClient(serverAddr, clientAddr, port + 1, "Hello from client2", interval);
+        //Callable<String> client2 = new DBLTestClient(serverAddr, clientAddr, port + 1, "Hello from client2", interval);
 
         Future<String> result1 = pool.submit(client1);
         Thread.sleep(1000);
-        Future<String> result2 = pool.submit(client2);
+        //Future<String> result2 = pool.submit(client2);
         result1.get();
-        result2.get();
+        //result2.get();
         pool.shutdown();
     }
 
