@@ -12,6 +12,7 @@
 #endif
 #include <dbl.h>
 #include "com_sock_udp_DBLUDPSocket.h"
+#include "com_sock_tcp_DBLTCPSocket.h"
 
 //#ifdef _WIN32
 //#pragma comment(lib, "ws2_32.lib")
@@ -37,13 +38,12 @@ typedef int bool;
 dbl_device_t **devices;
 dbl_channel_t **channels;
 dbl_send_t **send_handles;
-dbl_device_t dev;
 
 int channels_num = 0;
 int devices_num = 0;
 int send_handles_num = 0;
 
-enum dbl_recvmode rmode = DBL_RECV_DEFAULT;
+//enum dbl_recvmode rmode = DBL_RECV_DEFAULT;
 
 JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_init(JNIEnv *env, jclass class){
     printf("Try to dbl_init()\n");
@@ -263,4 +263,52 @@ JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_closeC(JNIEnv *env, jobjec
 JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_sendDisconnectC(JNIEnv *env, jobject obj, jint handleId){
     printf("C: Try to dbl_send_disconnect()\n");
     return dbl_send_disconnect((*send_handles[(int)handleId]));
+}
+
+//=========================TCP PART=======================================
+
+JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpSendC(JNIEnv *env, jobject obj, jint channId, jbyteArray buf, jint bufLen, jint flag) {
+    jboolean is_copy;
+    char *buf_c = (*env) -> GetByteArrayElements(env, buf, &is_copy);
+    int sendedBytes = 0;
+    DBL_Safe(dbl_ext_send((*channels[channId]), buf_c, bufLen, flag, &sendedBytes));
+    (*env) -> ReleaseByteArrayElements(env, buf, buf_c, JNI_ABORT);
+    return sendedBytes;
+}
+
+JNIEXPORT void JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpAcceptC(JNIEnv *env, jobject obj, jint channId, jobject newSocket) {
+    struct sockaddr_in new_socket;
+    channels = (dbl_channel_t **) realloc(channels, (channels_num + 1) * sizeof(dbl_channel_t *));
+    channels[channels_num] = (dbl_channel_t *) malloc(sizeof(dbl_channel_t));
+    channels_num++;
+    int sock_len = sizeof(new_socket);
+    dbl_ext_accept((*channels[channId]), &new_socket, &sock_len, NULL, channels[channels_num - 1]);
+}
+
+JNIEXPORT void JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpListenC(JNIEnv *env, jobject obj, jint channId) {
+
+}
+
+JNIEXPORT jbyteArray JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpReceiveC(JNIEnv *env, jobject obj, jint channId, jint rcvMode, jint bufLen, jobject rcvInfo) {
+
+}
+
+JNIEXPORT jobjectArray JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpReceiveMsgC(JNIEnv *env, jobject obj, jint devId, jint rcvMode, jint rcvMax) {
+
+}
+
+JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpPollC(JNIEnv *env, jobject obj, jintArray channels, jint arrLen, jint timeout) {
+
+}
+
+JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_getChannelOptionsC(JNIEnv *env, jobject obj, jint channId, jint level, jint optName) {
+
+}
+
+JNIEXPORT void JNICALL Java_com_sock_tcp_DBLTCPSocket_setChannelOptionsC(JNIEnv *env, jobject obj, jint channId, jint level, jint optName, jint optVal) {
+
+}
+
+JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_getChannelTypeC(JNIEnv *env, jobject obj, jint channId) {
+
 }
