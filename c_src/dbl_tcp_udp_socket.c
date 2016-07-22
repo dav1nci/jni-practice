@@ -266,6 +266,7 @@ JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_sendDisconnectC(JNIEnv *en
 }
 
 //=========================TCP PART=======================================
+#if 0
 
 JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpSendC(JNIEnv *env, jobject obj, jint channId, jbyteArray buf, jint bufLen, jint flag) {
     jboolean is_copy;
@@ -276,39 +277,128 @@ JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpSendC(JNIEnv *env, jobj
     return sendedBytes;
 }
 
-JNIEXPORT void JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpAcceptC(JNIEnv *env, jobject obj, jint channId, jobject newSocket) {
+JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpAcceptC(JNIEnv *env, jobject obj, jint channId, jobject newSocket) {
     struct sockaddr_in new_socket;
     channels = (dbl_channel_t **) realloc(channels, (channels_num + 1) * sizeof(dbl_channel_t *));
     channels[channels_num] = (dbl_channel_t *) malloc(sizeof(dbl_channel_t));
     channels_num++;
     int sock_len = sizeof(new_socket);
-    dbl_ext_accept((*channels[channId]), &new_socket, &sock_len, NULL, channels[channels_num - 1]);
+    int res = dbl_ext_accept((*channels[channId]), (struct sockaddr *) &new_socket, &sock_len, NULL, channels[channels_num - 1]);
+
+    jclass DBLTCPSocket_class = (*env) -> GetObjectClass(env, newSocket);
+
+    jfieldID fidAddress   = (*env) -> GetFieldID(env, DBLTCPSocket_class, "address",   "I");
+    jfieldID fidPort      = (*env) -> GetFieldID(env, DBLTCPSocket_class, "port",      "I");
+    jfieldID fidChannelId = (*env) -> GetFieldID(env, DBLTCPSocket_class, "channelId", "I");
+
+    (*env) -> SetIntField(env, newSocket, fidChannelId, (channels_num - 1)             );
+    (*env) -> SetIntField(env, newSocket, fidPort,      ntohs(new_socket.sin_port)     );
+#ifdef _WIN32
+    (*env) -> SetIntField(env, newSocket, fidAddress,   new_socket.sin_addr.S_un.S_addr);
+#else
+    (*env) -> SetIntField(env, newSocket, fidAddress,   new_socket.sin_addr.s_addr     );
+#endif
+    return res;
 }
 
-JNIEXPORT void JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpListenC(JNIEnv *env, jobject obj, jint channId) {
-
+JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpListenC(JNIEnv *env, jobject obj, jint channId) {
+    return dbl_ext_listen((*channels[channId]));
 }
 
 JNIEXPORT jbyteArray JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpReceiveC(JNIEnv *env, jobject obj, jint channId, jint rcvMode, jint bufLen, jobject rcvInfo) {
+    enum dbl_recvmode rmode = rcvMode;
+    char buf_c[bufLen];
+    struct dbl_recv_info info;
+    dbl_ext_recv((*channels[channId]), rmode, buf_c, bufLen, &info);
 
+    jclass DBLReceiveInfo_class = (*env) -> GetObjectClass(env, rcvInfo);
+
+    jfieldID fidchannelId = (*env) -> GetFieldID(env, DBLReceiveInfo_class, "channelId", "I");
+    jfieldID fidfrom      = (*env) -> GetFieldID(env, DBLReceiveInfo_class, "from",      "I");
+    jfieldID fidto        = (*env) -> GetFieldID(env, DBLReceiveInfo_class, "to",        "I");
+    jfieldID fidmsgLen    = (*env) -> GetFieldID(env, DBLReceiveInfo_class, "msgLen",    "I");
+    jfieldID fidtimestamp = (*env) -> GetFieldID(env, DBLReceiveInfo_class, "timestamp", "I");
+
+    (*env) -> SetIntField(env, rcvInfo, fidchannelId, channId);
+    (*env) -> SetIntField(env, rcvInfo, fidfrom,      info.sin_from.sin_addr.s_addr);
+    (*env) -> SetIntField(env, rcvInfo, fidto,        info.sin_to.sin_addr.s_addr);
+    (*env) -> SetIntField(env, rcvInfo, fidmsgLen,    info.msg_len);
+    (*env) -> SetIntField(env, rcvInfo, fidtimestamp, info.timestamp);
+
+    jbyteArray buf = (*env) -> NewByteArray(env, bufLen);
+    (*env) -> SetByteArrayRegion(env, buf, 0, bufLen, buf_c);
+    return buf;
 }
 
 JNIEXPORT jobjectArray JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpReceiveMsgC(JNIEnv *env, jobject obj, jint devId, jint rcvMode, jint rcvMax) {
+    enum dbl_recvmode rmode = rcvMode;
+    struct dbl_recv_info **info_array = (struct dbl_recv_info **) malloc(rcvMax * sizeof(struct dbl_recv_info *));
+    int i = 0;
+    for (i = 0; i < rcvMax; ++i) {
+        info_array[i] = (struct dbl_recv_info *) malloc(sizeof(struct dbl_recv_info));
+    }
+    
+    DBL_Safe(dbl_ext_recvmsg((*devices[devId]), rmode, info_array, rcvMax));
 
+    jclass DBLReceiveInfo_class = (*env) -> FindClass(env, "com/sock/tcp/DBLReceiveInfo");
+
+    // Get fields in class DBLReceiveInfo
+    jfieldID fidchannelId = (*env) -> GetFieldID(env, DBLReceiveInfo_class, "channelId", "I");
+    jfieldID fidfrom      = (*env) -> GetFieldID(env, DBLReceiveInfo_class, "from",      "I");
+    jfieldID fidto        = (*env) -> GetFieldID(env, DBLReceiveInfo_class, "to",        "I");
+    jfieldID fidmsgLen    = (*env) -> GetFieldID(env, DBLReceiveInfo_class, "msgLen",    "I");
+    jfieldID fidtimestamp = (*env) -> GetFieldID(env, DBLReceiveInfo_class, "timestamp", "I");
+    
+    // Get constructor of class DBLReceiveInfo
+    jmethodID DBLReceiveInfo_init = (*env) -> GetMethodID(env, DBLReceiveInfo_class, "<init>", "()V");
+
+    jobjectArray result_array = (*env) -> NewObjectArray(env, rcvMax, DBLReceiveInfo_class, NULL);
+    for (i = 0; i < rcvMax; ++i) {
+        jobject temp = (*env) -> NewObject(env, DBLReceiveInfo_class, DBLReceiveInfo_init);
+
+        //(*env) -> SetIntField(env, temp, fidchannelId, channId);
+        (*env) -> SetIntField(env, temp, fidfrom,      info_array[i] -> sin_from.sin_addr.s_addr);
+        (*env) -> SetIntField(env, temp, fidto,        info_array[i] -> sin_to.sin_addr.s_addr);
+        (*env) -> SetIntField(env, temp, fidmsgLen,    info_array[i] -> msg_len);
+        (*env) -> SetIntField(env, temp, fidtimestamp, info_array[i] -> timestamp);
+
+        (*env) -> SetObjectArrayElement(env, result_array, i, temp);
+    }
+
+    // Free resources
+    for (i = 0; i < rcvMax; ++i) {
+        free(info_array[i]);
+    }
+    free(info_array);
+
+    return result_array;
 }
 
-JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpPollC(JNIEnv *env, jobject obj, jintArray channels, jint arrLen, jint timeout) {
-
+JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpPollC(JNIEnv *env, jobject obj, jintArray channels_j, jint arrLen, jint timeout) {
+    dbl_channel_t channels_c[1000];
+    jint *channels_ind_c = (*env) -> GetIntArrayElements(env, channels_j, NULL);
+    int i = 0;
+    for (i = 0; i < arrLen; ++i) {
+        channels_c[i] = (*channels[channels_ind_c[i]]);
+    }
+    return dbl_ext_poll(channels_c, arrLen, timeout);
 }
 
 JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_getChannelOptionsC(JNIEnv *env, jobject obj, jint channId, jint level, jint optName) {
-
+    int opt_val;
+    int val_size = sizeof(int);
+    DBL_Safe(dbl_ext_getchopt((*channels[channId]), level, optName, &opt_val, &val_size));
+    return opt_val;
 }
 
-JNIEXPORT void JNICALL Java_com_sock_tcp_DBLTCPSocket_setChannelOptionsC(JNIEnv *env, jobject obj, jint channId, jint level, jint optName, jint optVal) {
-
+JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_setChannelOptionsC(JNIEnv *env, jobject obj, jint channId, jint level, jint optName, jint optVal) {
+    int opt_val_c = optVal;
+    int opt_size = sizeof(int);
+    return dbl_ext_setchopt((*channels[channId]), level, optName, &opt_val_c, opt_size);
 }
 
 JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_getChannelTypeC(JNIEnv *env, jobject obj, jint channId) {
-
+    return dbl_ext_channel_type((*channels[channId]));
 }
+
+#endif

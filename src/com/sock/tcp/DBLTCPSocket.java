@@ -65,12 +65,12 @@ public class DBLTCPSocket extends DBLUDPSocket{
     }
 
     private native int tcpSendC(int channId, byte[] buf, int bufLen, int flag);
-    private native void tcpAcceptC(int channId, DBLTCPSocket newSocket);
-    private native void tcpListenC(int channId);
+    private native int tcpAcceptC(int channId, DBLTCPSocket newSocket);
+    private native int tcpListenC(int channId);
     private native byte[] tcpReceiveC(int channId, int rcvMode, int bufLen, DBLReceiveInfo rcvInfo);
     private native DBLReceiveInfo[] tcpReceiveMsgC(int devId, int rcvMode, int rcvMax);
     private native int tcpPollC(int[] channels, int arrayLen, int timeout);
     private native int getChannelOptionsC(int channId, int level, int optName);
-    private native void setChannelOptionsC(int channId, int level, int optName, int optVal);
+    private native int setChannelOptionsC(int channId, int level, int optName, int optVal);
     private native int getChannelTypeC(int channId);
 }

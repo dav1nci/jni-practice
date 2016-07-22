@@ -12,7 +12,7 @@ public class DBLUDPSocket extends AbstractUDPSocket {
     private static int initStatus;
 
     static {
-        System.loadLibrary("dbl_udp");
+        System.loadLibrary("dbl");
         initStatus = init();
     }
 

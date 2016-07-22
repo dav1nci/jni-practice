@@ -18,17 +18,17 @@ JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpSendC
 /*
  * Class:     com_sock_tcp_DBLTCPSocket
  * Method:    tcpAcceptC
- * Signature: (ILcom/sock/tcp/DBLTCPSocket;)V
+ * Signature: (ILcom/sock/tcp/DBLTCPSocket;)I
  */
-JNIEXPORT void JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpAcceptC
+JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpAcceptC
   (JNIEnv *, jobject, jint, jobject);
 
 /*
  * Class:     com_sock_tcp_DBLTCPSocket
  * Method:    tcpListenC
- * Signature: (I)V
+ * Signature: (I)I
  */
-JNIEXPORT void JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpListenC
+JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpListenC
   (JNIEnv *, jobject, jint);
 
 /*
@@ -66,9 +66,9 @@ JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_getChannelOptionsC
 /*
  * Class:     com_sock_tcp_DBLTCPSocket
  * Method:    setChannelOptionsC
- * Signature: (IIII)V
+ * Signature: (IIII)I
  */
-JNIEXPORT void JNICALL Java_com_sock_tcp_DBLTCPSocket_setChannelOptionsC
+JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_setChannelOptionsC
   (JNIEnv *, jobject, jint, jint, jint, jint);
 
 /*
