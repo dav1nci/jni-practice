@@ -27,7 +27,7 @@ win:
 	gcc c_src/kernel_udp_socket.c -o lib/kernel_udp.dll -I"C:\Program Files\Java\jdk1.8.0_91\include" -I"C:\Program Files\Java\jdk1.8.0_91\include\win32" -shared -l"ws2_32"
 	gcc c_src/kernel_tcp_socket.c -o lib/kernel_tcp.dll -I"C:\Program Files\Java\jdk1.8.0_91\include" -I"C:\Program Files\Java\jdk1.8.0_91\include\win32" -shared -l"ws2_32"
 	gcc c_src/dbl_tcp_udp_socket.c -o lib/dbl.dll -I"C:\Program Files\Java\jdk1.8.0_91\include" -I"C:\Program Files\Java\jdk1.8.0_91\include\win32" -I"C:\DBL_Myri-10G\include" -L"C:\DBL_Myri-10G\lib" -ldbl -Wl,-rpath="C:\DBL_Myri-10G\lib" -shared -l"ws2_32"
-	java -Djava.library.path=lib/ -classpath bin/ com.sock.Application 10.115.66.128 10.115.66.128 8888 3 server 100
+	java -Djava.library.path=lib/ -classpath bin/ com.sock.Application 10.115.66.128 10.115.66.128 8888 5
 
 lin:
 	gcc c_src/kernel_udp_socket.c -o lib/libkernel_udp.so -I/usr/lib/jvm/java-8-oracle/include/ -I/usr/lib/jvm/java-8-oracle/include/linux/ -shared -fPIC
