@@ -16,6 +16,11 @@
 #pragma comment(lib, "ws2_32.lib")
 #endif
 
+typedef int bool;
+#define true 1
+#define false 0
+bool is_init = false;
+
 void throw_new_Exception(JNIEnv *env, char *reason) {
     char *className = "java/lang/Exception";
     jclass excClass = (*env) -> FindClass(env, className);
@@ -27,8 +32,8 @@ JNIEXPORT jint JNICALL Java_com_sock_tcp_KernelTCPSocket_createSocketC(JNIEnv *e
 #ifdef _WIN32
     if (is_init == false){
         WSADATA wsa;
-        Initialise winsock
-            printf("\nInitialising Winsock...");
+        //Initialise winsock
+        printf("\nInitialising Winsock...");
         if (WSAStartup(MAKEWORD(2,2),&wsa) != 0)
         {
             printf("Failed. Error Code : %d",WSAGetLastError());
