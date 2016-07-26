@@ -88,6 +88,23 @@ public abstract class AbstractUDPSocket {
         return ipInt;
     }
 
+    public static int hostToInt2(String host) throws Exception {
+        if ( host == null || host.length() < 7 || host.length() > 15)
+            throw new Exception("Bad ip address argument");
+
+        String[] ipByStringParts = host.split("\\.");
+        if ( ipByStringParts.length != 4)
+            throw new Exception("Bad ip address argument2");
+        int ipInt = 0;
+        for (int i = 3; i >= 0; --i) {
+            int ipVal = Integer.parseInt(ipByStringParts[i]);
+            if ( ipVal < 0 || ipVal > 255)
+                throw new Exception("Bad ip address argument3");
+            ipInt = (ipInt << 8) + ipVal;
+        }
+        return ipInt;
+    }
+
     public static int hostToInt(SocketAddress address) {
         byte host[] = ((InetSocketAddress) address).getAddress().getAddress();
         return host[3] << 24 | (host[2] & 0xFF) << 16 | (host[1] & 0xFF) << 8 | (host[0] & 0xFF);
