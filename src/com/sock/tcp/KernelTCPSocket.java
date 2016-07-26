@@ -86,12 +86,12 @@ public class KernelTCPSocket {
         }
     }
 
-    public byte[] receive(KernelTCPSocket socket, int bufLen, int flag) {
-        return receiveC(socket.getSockId(), bufLen, flag);
+    public int receive(KernelTCPSocket socket, byte[] buf, int bufLen, int flag) {
+        return receiveC(socket.getSockId(), buf, bufLen, flag);
     }
 
-    public byte[] receive(int bufLen, int flag) {
-        return receiveC(this.sockId, bufLen, flag);
+    public int receive(byte[] buf, int bufLen, int flag) {
+        return receiveC(this.sockId, buf, bufLen, flag);
     }
 
     public void close() {
@@ -165,7 +165,7 @@ public class KernelTCPSocket {
     private native void acceptC(int sockId, KernelTCPSocket socket);
     private native void connectC(int sockId, int host, int port);
     private native void sendC(int sockId, byte[] buf, int bufLen, int flag);
-    private native byte[] receiveC(int sockId, int bufLen, int flag);
+    private native int receiveC(int sockId, byte[] buf, int bufLen, int flag);
     private native void setTimeoutReceiveC(int sockId, int sec, long microsec);
     private native void setTimeoutSendC(int sockId, int sec, long microsec);
     private native void setReuseAddrC(int sockId, int flag);

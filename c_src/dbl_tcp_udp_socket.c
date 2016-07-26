@@ -266,7 +266,7 @@ JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_sendDisconnectC(JNIEnv *en
 }
 
 //=========================TCP PART=======================================
-#if 0
+#if 1
 
 JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpSendC(JNIEnv *env, jobject obj, jint channId, jbyteArray buf, jint bufLen, jint flag) {
     jboolean is_copy;
@@ -305,11 +305,16 @@ JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpListenC(JNIEnv *env, jo
     return dbl_ext_listen((*channels[channId]));
 }
 
-JNIEXPORT jbyteArray JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpReceiveC(JNIEnv *env, jobject obj, jint channId, jint rcvMode, jint bufLen, jobject rcvInfo) {
+JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpReceiveC(JNIEnv *env, jobject obj, jint channId, jint rcvMode, jbyteArray buf_j, jint bufLen, jobject rcvInfo) {
     enum dbl_recvmode rmode = rcvMode;
-    char buf_c[bufLen];
     struct dbl_recv_info info;
-    dbl_ext_recv((*channels[channId]), rmode, buf_c, bufLen, &info);
+
+    jboolean isCopy;
+    // Java GC stops here
+    jbyte *buf_c = (jbyte *) (*env) -> GetPrimitiveArrayCritical(env, buf_j, &isCopy);
+    int res = dbl_ext_recv((*channels[channId]), rmode, buf_c, bufLen, &info);
+    // Java GC continue here
+    (*env) -> ReleasePrimitiveArrayCritical(env, buf_j, buf_c, JNI_ABORT);
 
     jclass DBLReceiveInfo_class = (*env) -> GetObjectClass(env, rcvInfo);
 
@@ -325,9 +330,7 @@ JNIEXPORT jbyteArray JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpReceiveC(JNIEnv *
     (*env) -> SetIntField(env, rcvInfo, fidmsgLen,    info.msg_len);
     (*env) -> SetIntField(env, rcvInfo, fidtimestamp, info.timestamp);
 
-    jbyteArray buf = (*env) -> NewByteArray(env, bufLen);
-    (*env) -> SetByteArrayRegion(env, buf, 0, bufLen, buf_c);
-    return buf;
+    return res;
 }
 
 JNIEXPORT jobjectArray JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpReceiveMsgC(JNIEnv *env, jobject obj, jint devId, jint rcvMode, jint rcvMax) {

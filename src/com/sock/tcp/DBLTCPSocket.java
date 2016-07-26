@@ -32,12 +32,12 @@ public class DBLTCPSocket extends DBLUDPSocket{
         this.tcpListenC(this.channelId);
     }
 
-    public byte[] tcpReceive(int recvMode, int bufLen, DBLReceiveInfo info) {
-        return this.tcpReceiveC(this.channelId, recvMode, bufLen, info);
+    public int tcpReceive(int recvMode, byte[] buf, int bufLen, DBLReceiveInfo info) {
+        return this.tcpReceiveC(this.channelId, recvMode, buf, bufLen, info);
     }
 
-    public byte[] tcpReceive(DBLTCPSocket socket, int recvMode, int bufLen, DBLReceiveInfo info) {
-        return this.tcpReceiveC(socket.channelId, recvMode, bufLen, info);
+    public int tcpReceive(DBLTCPSocket socket, int recvMode, byte[] buf, int bufLen, DBLReceiveInfo info) {
+        return this.tcpReceiveC(socket.channelId, recvMode, buf, bufLen, info);
     }
 
     public DBLReceiveInfo[] tcpReceiveMsg(int recvMode, int recvMax) {
@@ -67,7 +67,7 @@ public class DBLTCPSocket extends DBLUDPSocket{
     private native int tcpSendC(int channId, byte[] buf, int bufLen, int flag);
     private native int tcpAcceptC(int channId, DBLTCPSocket newSocket);
     private native int tcpListenC(int channId);
-    private native byte[] tcpReceiveC(int channId, int rcvMode, int bufLen, DBLReceiveInfo rcvInfo);
+    private native int tcpReceiveC(int channId, int rcvMode, byte[] buf, int bufLen, DBLReceiveInfo rcvInfo);
     private native DBLReceiveInfo[] tcpReceiveMsgC(int devId, int rcvMode, int rcvMax);
     private native int tcpPollC(int[] channels, int arrayLen, int timeout);
     private native int getChannelOptionsC(int channId, int level, int optName);

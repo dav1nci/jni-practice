@@ -24,9 +24,10 @@ public class KernelClient implements Callable<Void> {
     public Void call() throws Exception {
         System.out.println("Java: try to connect");
         socket.connect(serverAddr, serverPort);
-        byte[] responce = socket.receive(50, 0);
+        byte[] resp = new byte[50];
+        socket.receive(resp, resp.length, 0);
         System.out.print("Java: client receive message from server: ");
-        for (byte i : responce)
+        for (byte i : resp)
             System.out.print((char)i);
         System.out.println();
         String clientMessage = "Thanks";

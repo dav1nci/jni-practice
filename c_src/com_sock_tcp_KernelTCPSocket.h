@@ -58,10 +58,10 @@ JNIEXPORT void JNICALL Java_com_sock_tcp_KernelTCPSocket_sendC
 /*
  * Class:     com_sock_tcp_KernelTCPSocket
  * Method:    receiveC
- * Signature: (III)[B
+ * Signature: (I[BII)I
  */
-JNIEXPORT jbyteArray JNICALL Java_com_sock_tcp_KernelTCPSocket_receiveC
-  (JNIEnv *, jobject, jint, jint, jint);
+JNIEXPORT jint JNICALL Java_com_sock_tcp_KernelTCPSocket_receiveC
+  (JNIEnv *, jobject, jint, jbyteArray, jint, jint);
 
 /*
  * Class:     com_sock_tcp_KernelTCPSocket

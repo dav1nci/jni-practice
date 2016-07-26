@@ -34,10 +34,10 @@ JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpListenC
 /*
  * Class:     com_sock_tcp_DBLTCPSocket
  * Method:    tcpReceiveC
- * Signature: (IIILcom/sock/tcp/DBLReceiveInfo;)[B
+ * Signature: (II[BILcom/sock/tcp/DBLReceiveInfo;)I
  */
-JNIEXPORT jbyteArray JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpReceiveC
-  (JNIEnv *, jobject, jint, jint, jint, jobject);
+JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpReceiveC
+  (JNIEnv *, jobject, jint, jint, jbyteArray, jint, jobject);
 
 /*
  * Class:     com_sock_tcp_DBLTCPSocket

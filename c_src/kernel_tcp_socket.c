@@ -119,20 +119,23 @@ JNIEXPORT void JNICALL Java_com_sock_tcp_KernelTCPSocket_sendC(JNIEnv *env, jobj
     }
 }
 
-JNIEXPORT jbyteArray JNICALL Java_com_sock_tcp_KernelTCPSocket_receiveC(JNIEnv *env, jobject obj, jint sockId, jint bufLen, jint flag) {
-    char buf[bufLen];
-    memset(buf, '\0', sizeof(buf));
+JNIEXPORT jint JNICALL Java_com_sock_tcp_KernelTCPSocket_receiveC(JNIEnv *env, jobject obj, jint sockId, jbyteArray buf_j, jint bufLen, jint flag) {
+    //char buf[bufLen];
+    //memset(buf, '\0', sizeof(buf));
+    jboolean isCopy;
+    jbyte *buf = (jbyte *) (*env) -> GetPrimitiveArrayCritical(env, buf_j, &isCopy);
     int result = recv(sockId, buf, bufLen, flag);
+    (*env) -> ReleasePrimitiveArrayCritical(env, buf_j, buf, JNI_ABORT);
     if(result == -1) {
         throw_new_Exception(env, "Cannot receive failed");
     }
     printf("C: recv() message = %s\n", buf);
 
     // Creating java byte array and copy receiving message to them
-    jbyteArray return_val = (*env) -> NewByteArray(env, bufLen);
-    (*env) -> SetByteArrayRegion(env, return_val, 0, bufLen, buf);
+    //jbyteArray return_val = (*env) -> NewByteArray(env, bufLen);
+    //(*env) -> SetByteArrayRegion(env, return_val, 0, bufLen, buf);
     
-    return return_val;
+    return result;
 }
 
 JNIEXPORT void JNICALL Java_com_sock_tcp_KernelTCPSocket_setTimeoutReceiveC(JNIEnv *env, jobject obj, jint sockId, jint sec, jlong microsec) {

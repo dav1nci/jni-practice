@@ -35,8 +35,10 @@ public class KernelServer implements Callable<Void> {
             System.out.println("Java: server try to send message: " + message);
             socket.send(newConnection, message.getBytes(), flag);
             System.out.println("Java: server try to receive message: ");
-            byte[] responce = socket.receive(newConnection, 50, 0);
-            System.out.println("Java: server receive message: " + new String(responce));
+
+            byte[] resp = new byte[50];
+            socket.receive(newConnection, resp, resp.length, 0);
+            System.out.println("Java: server receive message: " + new String(resp));
             //socket.close();
             if (false)
                 break;
