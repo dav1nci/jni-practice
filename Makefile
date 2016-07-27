@@ -26,13 +26,13 @@ bin/com/app/nativecalls/NativeCallsDemo.class:
 win:
 	gcc c_src/kernel_udp_socket.c -o lib/kernel_udp.dll -I"C:\Program Files\Java\jdk1.8.0_91\include" -I"C:\Program Files\Java\jdk1.8.0_91\include\win32" -shared -l"ws2_32"
 	gcc c_src/kernel_tcp_socket.c -o lib/kernel_tcp.dll -I"C:\Program Files\Java\jdk1.8.0_91\include" -I"C:\Program Files\Java\jdk1.8.0_91\include\win32" -shared -l"ws2_32"
-	gcc c_src/dbl_tcp_udp_socket.c -o lib/dbl.dll -I"C:\Program Files\Java\jdk1.8.0_91\include" -I"C:\Program Files\Java\jdk1.8.0_91\include\win32" -I"C:\DBL_Myri-10G\include" -L"C:\DBL_Myri-10G\lib" -ldbl -Wl,-rpath="C:\DBL_Myri-10G\lib" -shared -l"ws2_32"
-	java -Djava.library.path=lib/ -classpath bin/ com.sock.Application 10.115.66.128 10.115.66.128 8888 5
+	gcc c_src/dbl_tcp_udp_socket.c -o lib/dbl_tcp_udp.dll -I"C:\Program Files\Java\jdk1.8.0_91\include" -I"C:\Program Files\Java\jdk1.8.0_91\include\win32" -I"C:\DBL_Myri-10G\include" -L"C:\DBL_Myri-10G\lib" -l"dbl" -l"dbltcp" -Wl,-rpath="C:\DBL_Myri-10G\lib" -shared -l"ws2_32"
+	java -Djava.library.path=lib/ -classpath bin/ com.sock.Application 192.168.0.105 10.115.66.128 8888 6 server 100
 
 lin:
 	gcc c_src/kernel_udp_socket.c -o lib/libkernel_udp.so -I/usr/lib/jvm/java-8-oracle/include/ -I/usr/lib/jvm/java-8-oracle/include/linux/ -shared -fPIC
 	gcc c_src/kernel_tcp_socket.c -o lib/libkernel_tcp.so -I/usr/lib/jvm/java-8-oracle/include/ -I/usr/lib/jvm/java-8-oracle/include/linux/ -shared -fPIC
-	gcc c_src/dbl_tcp_udp_socket.c -o lib/libdbl.so -I/usr/lib/jvm/java-8-oracle/include/ -I/usr/lib/jvm/java-8-oracle/include/linux/ -I/opt/dbl/include -L/opt/dbl/lib -ldbl -Wl,-rpath=/opt/dbl/lib/ -shared -fPIC
+	gcc c_src/dbl_tcp_udp_socket.c -o lib/libdbl_tcp_udp.so -I/usr/lib/jvm/java-8-oracle/include/ -I/usr/lib/jvm/java-8-oracle/include/linux/ -I/opt/dbl/include -L/opt/dbl/lib -ldbl -Wl,-rpath=/opt/dbl/lib/ -shared -fPIC
 	java -Djava.library.path=lib/ -classpath bin/ com.sock.Application 192.168.0.102 192.168.0.102 8888 5
 
 clean:

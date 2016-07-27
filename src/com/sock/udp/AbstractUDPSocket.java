@@ -19,7 +19,6 @@ public abstract class AbstractUDPSocket {
     protected boolean reuseAddr = false;
 
     abstract public void send(UDPPacket packet);
-    abstract public void bind(int address, int port) throws Exception;
     abstract public void connect(int address, int port);
     abstract public void disconnect();
     abstract public void close();

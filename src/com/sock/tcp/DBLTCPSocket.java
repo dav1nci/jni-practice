@@ -5,7 +5,7 @@ import com.sock.udp.DBLUDPSocket;
 /**
  * Created by stdima on 18.07.16.
  */
-public class DBLTCPSocket extends DBLUDPSocket{
+public class DBLTCPSocket extends DBLUDPSocket {
 
     public DBLTCPSocket(String address, int flag) throws Exception {
         super(address, flag);

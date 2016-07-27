@@ -11,6 +11,7 @@
 #include <arpa/inet.h>
 #endif
 #include <dbl.h>
+#include <dbl_ext.h>
 #include "com_sock_udp_DBLUDPSocket.h"
 #include "com_sock_tcp_DBLTCPSocket.h"
 
@@ -283,6 +284,7 @@ JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpAcceptC(JNIEnv *env, jo
     channels[channels_num] = (dbl_channel_t *) malloc(sizeof(dbl_channel_t));
     channels_num++;
     int sock_len = sizeof(new_socket);
+    printf("Try to dbl_ext_accept()\n");
     int res = dbl_ext_accept((*channels[channId]), (struct sockaddr *) &new_socket, &sock_len, NULL, channels[channels_num - 1]);
 
     jclass DBLTCPSocket_class = (*env) -> GetObjectClass(env, newSocket);
@@ -302,6 +304,7 @@ JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpAcceptC(JNIEnv *env, jo
 }
 
 JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpListenC(JNIEnv *env, jobject obj, jint channId) {
+    printf("try to dbl_ext_listen()\n");
     return dbl_ext_listen((*channels[channId]));
 }
 

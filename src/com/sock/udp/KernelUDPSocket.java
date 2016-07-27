@@ -32,7 +32,6 @@ public class KernelUDPSocket extends AbstractUDPSocket{
             sendToC(this.socketId, packet.getMessage(), packet.getBufLen(), packet.getHost(), packet.getPort());
     }
 
-    @Override
     public void bind(int address, int port){
         bindC(this.socketId, address, port);
         this.bound = true;

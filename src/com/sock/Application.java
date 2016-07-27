@@ -1,6 +1,9 @@
 package com.sock;
 
+import com.sock.tcp.DBLTCPSocket;
 import com.sock.tcp.KernelTCPSocket;
+import com.sock.test.tcp_test.DBLTcpClient;
+import com.sock.test.tcp_test.DBLTcpServer;
 import com.sock.test.tcp_test.KernelClient;
 import com.sock.test.tcp_test.KernelServer;
 import com.sock.test.udp_test.ClientSocket;
@@ -8,6 +11,8 @@ import com.sock.test.udp_test.DBLTestClient;
 import com.sock.test.udp_test.ServerSocket;
 import com.sock.udp.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.*;
 
 public class Application {
@@ -45,7 +50,44 @@ public class Application {
             case "5":
                 testTCPKernel(server, client, port);
                 break;
+            case "6":
+                String serverOrClient2 = args[4];
+                Integer interval2 = Integer.parseInt(args[5]);
+                if (serverOrClient2.equals("server")) {
+                    startDblTcpServer(server, port);
+                } else if (serverOrClient2.equals("client")) {
+                    startDblTcpClient(server, client, port, interval2);
+                }
+
         }
+    }
+
+    private static void startDblTcpServer(String serverAddr, int port) throws Exception{
+        DBLTCPSocket server = new DBLTCPSocket(serverAddr, DBLTCPSocket.DBL_OPEN_THREADSAFE);
+        ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        server.setBindFlag(DBLUDPSocket.DBL_BIND_REUSEADDR);
+        server.bind(port);
+        //server.bindAddr(serverAddr, port);
+        server.tcpListen();
+        List<Future<Void>> tasks = new ArrayList<>(1);
+        //while (true) {
+            DBLTCPSocket newConnection = server.tcpAccept();
+        System.out.println("Java: after accept()");
+            Callable<Void> connectionHandler = new DBLTcpServer();
+            Future<Void> serverResult = pool.submit(connectionHandler);
+            tasks.add(serverResult);
+            //if (false) // or lines after while(true) throws Unreachable code
+            //    break;
+        //}
+        for (Future<Void> task : tasks) {
+            task.get();
+        }
+        pool.shutdown();
+
+    }
+
+    private static void startDblTcpClient(String server, String client, int port, int interval) {
+
     }
 
     private static void testTCPKernel(String serverAddr, String clientAddr, int port) throws InterruptedException {

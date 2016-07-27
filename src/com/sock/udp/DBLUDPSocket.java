@@ -12,7 +12,8 @@ public class DBLUDPSocket extends AbstractUDPSocket {
     private static int initStatus;
 
     static {
-        System.loadLibrary("dbl");
+        System.loadLibrary("dbl_tcp_udp");
+        System.out.println("Java: library loaded");
         initStatus = init();
     }
 
@@ -67,8 +68,7 @@ public class DBLUDPSocket extends AbstractUDPSocket {
         }
     }
 
-    @Override
-    public void bind(int address, int port) throws Exception {
+    public void bind(int port) throws Exception {
         if (isBound())
             throw new Exception("Socket already bound to port " + this.getLocalPort());
         this.channelId = bindC(this.deviceId, this.bindFlag, port);

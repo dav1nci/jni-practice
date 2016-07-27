@@ -160,5 +160,10 @@ JNIEXPORT void JNICALL Java_com_sock_tcp_KernelTCPSocket_setReuseAddrC(JNIEnv *e
 }
 
 JNIEXPORT void JNICALL Java_com_sock_tcp_KernelTCPSocket_closeC(JNIEnv *env, jobject obj, jint sockId) {
-    close(sockId);
+    #ifdef _WIN32
+        closesocket((int)sockId);
+        WSACleanup();
+    #else
+        close((int)sockId);
+    #endif
 }

@@ -29,7 +29,7 @@ public class DBLTestClient implements Callable<String> {
     public String call() throws Exception {
         DBLUDPSocket client = new DBLUDPSocket(clientAddr, DBLUDPSocket.DBL_OPEN_THREADSAFE);
         try {
-            client.bind(0, port);
+            client.bind(port);
         } catch (Exception e) {
             e.printStackTrace();
         }
