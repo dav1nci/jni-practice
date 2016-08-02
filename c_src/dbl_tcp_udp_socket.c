@@ -40,6 +40,10 @@ dbl_device_t **devices;
 dbl_channel_t **channels;
 dbl_send_t **send_handles;
 
+// For deletion
+dbl_channel_t ch;
+dbl_channel_t ret_ch;
+
 int channels_num = 0;
 int devices_num = 0;
 int send_handles_num = 0;
@@ -67,15 +71,13 @@ JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_createDeviceC(JNIEnv *env,
 #endif
     printf("C: Create device with host %d\n", host);
 
-
     // Get memory for new device
     devices = (dbl_device_t **) realloc(devices, (devices_num + 1) * sizeof(dbl_device_t *));
     devices[devices_num] = (dbl_device_t *) malloc(sizeof(dbl_device_t));
 
-
     // Create a new dvice
     printf("C: Try dbl_open() dev num is : %d\n", devices_num);
-    DBL_Safe(dbl_open(&sin.sin_addr, 0, devices[devices_num]));
+    DBL_Safe(dbl_open(&sin.sin_addr, flag, devices[devices_num]));
     devices_num++;
     return devices_num - 1;
 }
@@ -140,10 +142,20 @@ JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_bindC(JNIEnv *env, jobject
     channels = (dbl_channel_t **) realloc(channels, (channels_num + 1) * sizeof(dbl_channel_t *));
     channels[channels_num] = (dbl_channel_t *) malloc(sizeof(dbl_channel_t));
     channels_num++;
-    printf("C: Try to dbl_bind() on port %d with device %d\n", port, (int)devId);
-    DBL_Safe(dbl_bind((*devices[(int)devId]), 0, (int)port, NULL, channels[channels_num - 1]));
-    //dbl_channel_t ch;
-    //DBL_Safe(dbl_bind(dev, 0, (int)port, NULL, &ch));
+    printf("C: Try to dbl_bind() on port %d with device %d and channel %d\n", port, (int)devId, (channels_num - 1));
+
+
+    int sock_type = DBL_TCP;
+    int proto_type = DBL_BSD;
+    int flags = DBL_CHANNEL_FLAGS(sock_type, proto_type);
+
+    // UNCOMMENT THIS!!!!
+    //DBL_Safe(dbl_bind((*devices[(int)devId]), flag, (int)port, NULL, channels[channels_num - 1]));
+
+    // Delete this
+    printf("C: tcp flag for bind is %d\n", flags);
+    DBL_Safe(dbl_bind((*devices[(int)devId]), flags, (int)port, NULL, &ch));
+
     return channels_num - 1;
 }
 
@@ -267,7 +279,7 @@ JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_sendDisconnectC(JNIEnv *en
 }
 
 //=========================TCP PART=======================================
-#if 1
+//#if 1
 
 JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpSendC(JNIEnv *env, jobject obj, jint channId, jbyteArray buf, jint bufLen, jint flag) {
     jboolean is_copy;
@@ -283,9 +295,14 @@ JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpAcceptC(JNIEnv *env, jo
     channels = (dbl_channel_t **) realloc(channels, (channels_num + 1) * sizeof(dbl_channel_t *));
     channels[channels_num] = (dbl_channel_t *) malloc(sizeof(dbl_channel_t));
     channels_num++;
-    int sock_len = sizeof(new_socket);
-    printf("Try to dbl_ext_accept()\n");
-    int res = dbl_ext_accept((*channels[channId]), (struct sockaddr *) &new_socket, &sock_len, NULL, channels[channels_num - 1]);
+    int sock_len = sizeof(struct sockaddr_in);
+    printf("Try to dbl_ext_accept() on channelId = %d\n", channId);
+
+    // Uncomment this
+    //int res = dbl_ext_accept((*channels[channId]), (struct sockaddr *) &new_socket, &sock_len, NULL, channels[channels_num - 1]);
+
+    // Delete this
+    int res = dbl_ext_accept(ch, (struct sockaddr *) &new_socket, &sock_len, NULL, &ret_ch);
 
     jclass DBLTCPSocket_class = (*env) -> GetObjectClass(env, newSocket);
 
@@ -304,8 +321,15 @@ JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpAcceptC(JNIEnv *env, jo
 }
 
 JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpListenC(JNIEnv *env, jobject obj, jint channId) {
-    printf("try to dbl_ext_listen()\n");
-    return dbl_ext_listen((*channels[channId]));
+    printf("try to dbl_ext_listen() channelId = %d\n", channId);
+    // Uncomment this
+    //int res = dbl_ext_listen((*channels[channId]));
+
+    //Delete this
+    int res = 0;
+    DBL_Safe(dbl_ext_listen(ch));
+
+    return res;
 }
 
 JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_tcpReceiveC(JNIEnv *env, jobject obj, jint channId, jint rcvMode, jbyteArray buf_j, jint bufLen, jobject rcvInfo) {
@@ -407,4 +431,4 @@ JNIEXPORT jint JNICALL Java_com_sock_tcp_DBLTCPSocket_getChannelTypeC(JNIEnv *en
     return dbl_ext_channel_type((*channels[channId]));
 }
 
-#endif
+//#endif

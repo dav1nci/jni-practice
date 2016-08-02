@@ -71,8 +71,9 @@ public class Application {
         server.tcpListen();
         List<Future<Void>> tasks = new ArrayList<>(1);
         //while (true) {
+        System.out.println("Channel type of server = " + server.tcpGetChannelType());
             DBLTCPSocket newConnection = server.tcpAccept();
-        System.out.println("Java: after accept()");
+        System.out.println("Java: after accept() host = " + newConnection.getLocalAddress() + " port = " + newConnection.getLocalPort());
             Callable<Void> connectionHandler = new DBLTcpServer();
             Future<Void> serverResult = pool.submit(connectionHandler);
             tasks.add(serverResult);

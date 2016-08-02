@@ -13,7 +13,6 @@ public class DBLUDPSocket extends AbstractUDPSocket {
 
     static {
         System.loadLibrary("dbl_tcp_udp");
-        System.out.println("Java: library loaded");
         initStatus = init();
     }
 
