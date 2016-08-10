@@ -51,7 +51,7 @@ int send_handles_num = 0;
 //enum dbl_recvmode rmode = DBL_RECV_DEFAULT;
 
 JNIEXPORT jint JNICALL Java_com_sock_udp_DBLUDPSocket_init(JNIEnv *env, jclass class){
-    printf("Try to dbl_init()\n");
+    printf("Try to dbl_init() API version = %d\n", DBL_VERSION_API);
     int res = dbl_init(DBL_VERSION_API);
     if (res != 0) {
         printf("dlb_init() return %d\n", res);

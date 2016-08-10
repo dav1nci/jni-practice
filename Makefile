@@ -15,9 +15,7 @@ all: bin/com/app/nativecalls/NativeCallsDemo.class
 
 bin/com/app/nativecalls/NativeCallsDemo.class:
 	mkdir bin
-	
 	javac -d bin/ @source.txt
-	
 	javah -d $(CSDIR) -classpath ./bin com.sock.udp.KernelUDPSocket
 	javah -d $(CSDIR) -classpath ./bin com.sock.udp.DBLUDPSocket
 	javah -d $(CSDIR) -classpath ./bin com.sock.tcp.KernelTCPSocket
@@ -65,3 +63,5 @@ jar:
 run:
 	java -Djava.library.path=lib/ -jar UDP.jar 10.115.66.185 10.115.55.185 8888 2 100
 
+exe:
+	gcc dbltcp_pingpong.c -o dbltcp_pingpong_source.exe -I"C:\Program Files\Java\jdk1.8.0_91\include" -I"C:\Program Files\Java\jdk1.8.0_91\include\win32" -I"C:\DBL_Myri-10G\include" -L"C:\DBL_Myri-10G\lib" -l"dbl" -l"dbltcp" -Wl,-rpath="C:\DBL_Myri-10G\lib" -l"ws2_32"

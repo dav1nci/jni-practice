@@ -46,7 +46,8 @@ public class DBLTCPSocket extends DBLUDPSocket {
         return this.tcpReceiveMsgC(this.deviceId, recvMode, recvMax);
     }
 
-    public int tcpPoll(DBLTCPSocket[] sockets, int arrayLen, int timeout) {
+    public int tcpPoll(DBLTCPSocket[] sockets, int timeout) {
+        int arrayLen = sockets.length;
         int[] channels = new int[arrayLen];
         for (int i = 0; i < arrayLen; ++i){
             channels[i] = sockets[i].channelId;
