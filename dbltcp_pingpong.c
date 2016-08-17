@@ -77,7 +77,7 @@ server(
   if (rc != 0) { rc = -rc; PERR("dbl_init"); }
 
   printf("Try to dbl_open()\n");
-  rc = dbl_open(&sin.sin_addr, 0, &dev);
+  rc = dbl_open(&sin.sin_addr, DBL_OPEN_THREADSAFE, &dev);
   if (rc != 0) {
       printf("dbl_open() finised with code %d\n", rc);
       rc = -rc;
@@ -88,14 +88,23 @@ server(
   sock_type  = DBL_TYPE_IS_TCP(type);
   proto_type = DBL_PROTO_IS_MTCP(type);
   int flags = DBL_CHANNEL_FLAGS(sock_type, proto_type);
-  flags |= DBL_OPEN_THREADSAFE;
+  //flags |= DBL_OPEN_THREADSAFE;
   printf("Try to dbl_bind() flags = %d\n", flags);
   int j = 0;
-  //for (j = 0; j < 4001; ++j) {
-    rc = dbl_bind(dev, flags, port, NULL, &ch);
+  for (j = 0; j < 60000; ++j) {
+    rc = dbl_bind(dev, j, j, NULL, &ch);
+    rc = dbl_ext_listen (ch);
     //printf("j = %d\n", j);
     if (rc != 0) { rc = -rc; PERR("dbl_bind"); }
-  //}
+    rc = dbl_ext_channel_type(ch);
+    if (rc == 1) {
+        printf("Channel type %d with j = %d\n", dbl_ext_channel_type(ch), j);
+    } else if (rc != 0) {
+        printf("rc != 0");
+    }
+    //rc = dbl_unbind(ch);
+    memset(ch, 0, sizeof(dbl_channel_t));
+  }
   /*rc = dbl_bind(dev, flags, port, NULL, &ch);
   if (rc != 0) { rc = -rc; PERR("dbl_bind"); }*/
 
@@ -143,7 +152,7 @@ int main(
 
   // flags |= DBL_OPEN_THREADSAFE;
 
-  server("10.116.2.177", flags, 12345);
+  server("10.116.2.177", flags, 8888);
 
   printf("Finished!\n");
   return 0;
