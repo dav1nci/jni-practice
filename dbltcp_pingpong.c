@@ -70,52 +70,54 @@ server(
   int proto_type;
   int i;
 
+  dbl_channel_t channs[5];
+
   /* build local socket address */
   memset(&sin, 0, sizeof(sin));
   sin.sin_family = AF_INET;
   sin.sin_port = htons(port);
   sin.sin_addr.s_addr = inet_addr(local_addr);
   //sin.sin_addr.S_un.S_addr = local_addr;
- printf("Addres for open is %d\n", sin.sin_addr.s_addr);
+ printf("Addres for open is %d\n", sin.sin_addr.S_un.S_addr);
 
   rc = dbl_init(DBL_VERSION_API);
   if (rc != 0) { rc = -rc; PERR("dbl_init"); }
 
   printf("Try to dbl_open()\n");
-  rc = dbl_open(&sin.sin_addr, DBL_OPEN_THREADSAFE, &dev);
+  rc = dbl_open(&sin.sin_addr, 0, &dev);
   if (rc != 0) {
       printf("dbl_open() finised with code %d\n", rc);
       rc = -rc;
       PERR("dbl_open")
   }
 
-  /* 1st channel is a TCP/MTCP ? */
-  sock_type  = DBL_TYPE_IS_TCP(type);
-  proto_type = DBL_PROTO_IS_MTCP(type);
-  int flags = DBL_CHANNEL_FLAGS(sock_type, proto_type);
-  //flags |= DBL_OPEN_THREADSAFE;
-  printf("Try to dbl_bind() flags = %d\n", flags);
-  int j = 0;
-  //for (j = 0; j < 60000; ++j) {
+   /* 1st channel is a TCP/MTCP ? */
+//    sock_type  = DBL_TYPE_IS_TCP(type);
+//    proto_type = DBL_PROTO_IS_MTCP(type);
+//    int flags = DBL_CHANNEL_FLAGS(sock_type, proto_type);
+
+    int flags = DBL_CHANNEL_FLAGS(DBL_TCP, DBL_BSD);
+    flags |= DBL_BIND_REUSEADDR | DBL_BIND_BROADCAST;
+
     printf("Try to dbl_bind() flag = %d, port = %d\n", flags, 8888);
-    rc = dbl_bind(dev, flags, 8888, NULL, &ch);
+    rc = dbl_bind(dev, flags, 8888, NULL, &channs[0]);
+    //rc = dbl_bind_addr(dev, &sin.sin_addr, flags, 8888, NULL, &channs[0]);
     if (rc != 0) { rc = -rc; PERR("dbl_bind"); }
+
     printf("Try to dbl_ext_listen()\n");
-    rc = dbl_ext_listen (ch);
-    printf("Try to dbl_ext_poll(), result = %d\n", dbl_ext_poll(&ch, 1, 10000));
-    //printf("j = %d\n", j);
-  /*rc = dbl_bind(dev, flags, port, NULL, &ch);
-  if (rc != 0) { rc = -rc; PERR("dbl_bind"); }*/
+    rc = dbl_ext_listen (channs[0]);
 
-  printf("Channel type %d\n", dbl_ext_channel_type(ch));
+    printf("Try to dbl_ext_poll()... ");
+    int r = dbl_ext_poll(channs, 1, 5000);
+    printf("result = %d\n", r);
 
-    if (rc != 0) { PERR("dbl_listen"); }
+    printf("Channel type %d\n", dbl_ext_channel_type(ch));
 
     printf ("Setting up to accept()\n");
-    rc = dbl_ext_accept (ch, (struct sockaddr *)&sin, &sinlen, NULL, &retch);
+    rc = dbl_ext_accept (channs[0], (struct sockaddr *)&sin, &sinlen, NULL, &retch);
     if (rc != 0) { PERR("dbl_ext_accept"); }
     printf ("Got TCP connection from %d\n", sin.sin_addr.s_addr);
-  //}
+
   /* Main loop, allocate receiving structures to be used in the
      reception recvmsg() function.
   */
@@ -147,7 +149,7 @@ int main(
 
   // flags |= DBL_OPEN_THREADSAFE;
 
-  server("10.116.2.203", flags, 8888);
+  server("10.116.2.177", flags, 8888);
 
   printf("Finished!\n");
   return 0;
