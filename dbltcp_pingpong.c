@@ -4,10 +4,15 @@
 #include <stdint.h>
 #include <errno.h>
 #include <assert.h>
+#ifdef _WIN32
 #include <winsock2.h>
 #include <ws2tcpip.h>
-#include "dbl.h"
-#include "dbl_ext.h"
+#else
+#include <arpa/inet.h>
+#endif
+#include <dbl.h>
+#include <dbl_ext.h>
+
 #ifndef _WIN32
 #include <math.h>
 #endif
@@ -17,16 +22,16 @@
 #endif
 
 #ifndef _WIN32
-#define PERR(err)				\
-  if (rc < 0) {					\
-    perror(err);				\
-    exit(1);					\
+#define PERR(err)                               \
+  if (rc < 0) {                                 \
+    perror(err);                                \
+    exit(1);                                    \
   }
 #else
-#define PERR(err)					\
-  if (rc < 0) {						\
-    printf ("%s: %d\n", err, WSAGetLastError());	\
-    exit(1);						\
+#define PERR(err)                                       \
+  if (rc < 0) {                                         \
+    printf ("%s: %d\n", err, WSAGetLastError());        \
+    exit(1);                                            \
   }
 #endif
 
@@ -56,22 +61,22 @@ server(
   dbl_channel_t *dchan;              /* DBL channel description */
   struct dbl_recv_info *rxi;         /* rxi recv info array for recvmsg */
   struct dbl_recv_info  rxinfo;      /* rxi recv info */
-  dbl_send_t sh;  
-  
+  dbl_send_t sh;
+
   int rc;
   char buf[20000];
   int sinlen = sizeof(struct sockaddr_in);
   int sock_type;
   int proto_type;
   int i;
-  
+
   /* build local socket address */
   memset(&sin, 0, sizeof(sin));
   sin.sin_family = AF_INET;
   sin.sin_port = htons(port);
-  inet_pton(AF_INET, local_addr, &sin.sin_addr);
+  sin.sin_addr.s_addr = inet_addr(local_addr);
   //sin.sin_addr.S_un.S_addr = local_addr;
-  printf("Addres for open is %d\n", sin.sin_addr.S_un.S_addr);
+ printf("Addres for open is %d\n", sin.sin_addr.s_addr);
 
   rc = dbl_init(DBL_VERSION_API);
   if (rc != 0) { rc = -rc; PERR("dbl_init"); }
@@ -81,7 +86,7 @@ server(
   if (rc != 0) {
       printf("dbl_open() finised with code %d\n", rc);
       rc = -rc;
-      PERR("dbl_open");
+      PERR("dbl_open")
   }
 
   /* 1st channel is a TCP/MTCP ? */
@@ -91,38 +96,28 @@ server(
   //flags |= DBL_OPEN_THREADSAFE;
   printf("Try to dbl_bind() flags = %d\n", flags);
   int j = 0;
-  for (j = 0; j < 60000; ++j) {
-    rc = dbl_bind(dev, j, j, NULL, &ch);
-    rc = dbl_ext_listen (ch);
-    //printf("j = %d\n", j);
+  //for (j = 0; j < 60000; ++j) {
+    printf("Try to dbl_bind() flag = %d, port = %d\n", flags, 8888);
+    rc = dbl_bind(dev, flags, 8888, NULL, &ch);
     if (rc != 0) { rc = -rc; PERR("dbl_bind"); }
-    rc = dbl_ext_channel_type(ch);
-    if (rc == 1) {
-        printf("Channel type %d with j = %d\n", dbl_ext_channel_type(ch), j);
-    } else if (rc != 0) {
-        printf("rc != 0");
-    }
-    //rc = dbl_unbind(ch);
-    memset(ch, 0, sizeof(dbl_channel_t));
-  }
+    printf("Try to dbl_ext_listen()\n");
+    rc = dbl_ext_listen (ch);
+    printf("Try to dbl_ext_poll(), result = %d\n", dbl_ext_poll(&ch, 1, 10000));
+    //printf("j = %d\n", j);
   /*rc = dbl_bind(dev, flags, port, NULL, &ch);
   if (rc != 0) { rc = -rc; PERR("dbl_bind"); }*/
 
   printf("Channel type %d\n", dbl_ext_channel_type(ch));
-
-    printf ("Setting up to listen()\n");
-    rc = dbl_ext_listen (ch);
-
 
     if (rc != 0) { PERR("dbl_listen"); }
 
     printf ("Setting up to accept()\n");
     rc = dbl_ext_accept (ch, (struct sockaddr *)&sin, &sinlen, NULL, &retch);
     if (rc != 0) { PERR("dbl_ext_accept"); }
-    printf ("Got TCP connection from %d\n", sin.sin_addr.S_un.S_addr);
+    printf ("Got TCP connection from %d\n", sin.sin_addr.s_addr);
   //}
   /* Main loop, allocate receiving structures to be used in the
-     reception recvmsg() function. 
+     reception recvmsg() function.
   */
   //rxi = calloc(2, sizeof(struct dbl_recv_info));
   //using_multiple_recvs = 0;
@@ -140,9 +135,9 @@ int main(
   int proto_type = DBL_BSD;
   int flags = 0;
 
-  printf ("Test will be using Type %s, Proto %s\n", 
-	  sock_type == 1 ? "DBL_TCP" : "DBL_UDP", 
-	  proto_type == 1 ? "DBL_BSD" : "DBL_MYRI");
+  printf ("Test will be using Type %s, Proto %s\n",
+          sock_type == 1 ? "DBL_TCP" : "DBL_UDP",
+          proto_type == 1 ? "DBL_BSD" : "DBL_MYRI");
 
   flags = DBL_CHANNEL_FLAGS(sock_type, proto_type);
 
@@ -152,7 +147,7 @@ int main(
 
   // flags |= DBL_OPEN_THREADSAFE;
 
-  server("10.116.2.177", flags, 8888);
+  server("10.116.2.203", flags, 8888);
 
   printf("Finished!\n");
   return 0;

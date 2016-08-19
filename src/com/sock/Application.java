@@ -87,8 +87,11 @@ public class Application {
 
     }
 
-    private static void startDblTcpClient(String server, String client, int port, int interval) {
-
+    private static void startDblTcpClient(String serverAddr, String clientAddr, int port, int interval) throws Exception{
+        DBLTCPSocket client = new DBLTCPSocket(clientAddr, DBLTCPSocket.DBL_OPEN_THREADSAFE);
+        client.bind(8888);
+        client.connect(AbstractUDPSocket.hostToInt(serverAddr), port);
+        
     }
 
     private static void testTCPKernel(String serverAddr, String clientAddr, int port) throws InterruptedException {

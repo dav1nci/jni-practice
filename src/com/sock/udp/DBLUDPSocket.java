@@ -86,7 +86,7 @@ public class DBLUDPSocket extends AbstractUDPSocket {
 
     @Override
     public void connect(int address, int port) {
-        this.sendHandleId = sendConnectC(this.channelId, address, port, 0, 0);
+        this.sendHandleId = sendConnectC(this.channelId, address, port, this.sendFlag, 0);
         this.connected = true;
     }
 
@@ -158,6 +158,10 @@ public class DBLUDPSocket extends AbstractUDPSocket {
 
     public void setRecvMode(int recvMode) {
         this.recvMode = recvMode;
+    }
+
+    public void setSendFlag(int sendFlag) {
+        this.sendFlag = sendFlag;
     }
 
     private static native int init();
